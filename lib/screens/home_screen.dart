@@ -1,16 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:haveliapp/Widgets/my_list_item.dart';
+import 'package:haveliapp/Widgets/product_item.dart';
 
-import '../models/student_model.dart';
+import '../models/product_model.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
 
-  List<StudentModel> list = [
-    StudentModel("ronak", "6th jan 2001", "77878788686", "4th", "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTLy0iBBKr839kRpNKRTr4nh7y-uMIeqgboOH6-O-9h&s",true),
-    StudentModel("ronak", "6th jan 2001", "77878788686", "4th", "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTLy0iBBKr839kRpNKRTr4nh7y-uMIeqgboOH6-O-9h&s",false),
-    StudentModel("ronak", "6th jan 2001", "77878788686", "4th", "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTLy0iBBKr839kRpNKRTr4nh7y-uMIeqgboOH6-O-9h&s",true),
-    StudentModel("ronak", "6th jan 2001", "77878788686", "4th", "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTLy0iBBKr839kRpNKRTr4nh7y-uMIeqgboOH6-O-9h&s",false),
-    StudentModel("ronak", "6th jan 2001", "77878788686", "4th", "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTLy0iBBKr839kRpNKRTr4nh7y-uMIeqgboOH6-O-9h&s",false),
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  List<ProductModel> list = [
+    ProductModel("Iphone 14 pro max 256gb (black)","Rs.1,39,999","Rs.1,49,999","https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQaucN9zuzGy4HmGLlO3S50Ih9iq9KYhz0nAQ&usqp=CAU",1),
+    ProductModel("Iphone 14 pro max 256gb (black)","Rs.1,39,999","Rs.1,49,999","https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQaucN9zuzGy4HmGLlO3S50Ih9iq9KYhz0nAQ&usqp=CAU",1),
+    ProductModel("Iphone 14 pro max 256gb (black)","Rs.1,39,999","Rs.1,49,999","https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQaucN9zuzGy4HmGLlO3S50Ih9iq9KYhz0nAQ&usqp=CAU",1),
+    ProductModel("Iphone 14 pro max 256gb (black)","Rs.1,39,999","Rs.1,49,999","https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQaucN9zuzGy4HmGLlO3S50Ih9iq9KYhz0nAQ&usqp=CAU",1),
+    ProductModel("Iphone 14 pro max 256gb (black)","Rs.1,39,999","Rs.1,49,999","https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQaucN9zuzGy4HmGLlO3S50Ih9iq9KYhz0nAQ&usqp=CAU",1),
   ];
 
   @override
@@ -19,7 +24,11 @@ class HomeScreen extends StatelessWidget {
       body: SingleChildScrollView(
         child: Column(
           children: [
-          ...list.map((StudentModel element)=>MyListItem(element)).toList()
+          ...list.map((ProductModel element)=>ProductItem(element,(){
+            setState(() {
+              list.remove(element);
+            });
+          })).toList()
           ],
         ),
       ),
