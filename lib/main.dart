@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:haveliapp/screens/home_screen.dart';
 
@@ -13,7 +14,8 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: "Haveli app",
+      debugShowCheckedModeBanner: false,
+      title: "Todo App",
       home: HomeScreen(),
     );
   }

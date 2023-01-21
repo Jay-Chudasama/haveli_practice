@@ -1,115 +1,104 @@
 import 'package:flutter/material.dart';
-import 'package:haveliapp/Widgets/product_item.dart';
+import 'package:haveliapp/screens/add_todo_screen.dart';
+import 'package:haveliapp/widgets/todo_item.dart';
 
-import '../models/product_model.dart';
+import '../models/todo_model.dart';
 
 class HomeScreen extends StatefulWidget {
+
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  TextEditingController controller = TextEditingController();
-
-  List<ProductModel> list = [
-    ProductModel(
-        "Iphone 14 pro max 512gb (black)",
-        "Rs.1,39,999",
-        "Rs.1,49,999",
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQaucN9zuzGy4HmGLlO3S50Ih9iq9KYhz0nAQ&usqp=CAU",
-        1),
-    ProductModel(
-        "Iphone 12 pro max 256gb (black)",
-        "Rs.1,39,999",
-        "Rs.1,49,999",
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQaucN9zuzGy4HmGLlO3S50Ih9iq9KYhz0nAQ&usqp=CAU",
-        1),
-    ProductModel(
-        "Iphone 13 pro max 256gb (black)",
-        "Rs.1,39,999",
-        "Rs.1,49,999",
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQaucN9zuzGy4HmGLlO3S50Ih9iq9KYhz0nAQ&usqp=CAU",
-        1),
-    ProductModel(
-        "Iphone 11 pro max 256gb (black)",
-        "Rs.1,39,999",
-        "Rs.1,49,999",
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQaucN9zuzGy4HmGLlO3S50Ih9iq9KYhz0nAQ&usqp=CAU",
-        1),
-    ProductModel(
-        "Iphone x pro max 256gb (black)",
-        "Rs.1,39,999",
-        "Rs.1,49,999",
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQaucN9zuzGy4HmGLlO3S50Ih9iq9KYhz0nAQ&usqp=CAU",
-        1),
+  List<TodoModel> list = [
+    TodoModel("Flutter coding...",true),
+    TodoModel("Dart coding...",false),
+    TodoModel("Object oops coding...",true),
+    TodoModel("JAVA coding...",false),
+    TodoModel("Node js coding...",true),
   ];
 
-  List<ProductModel> filterList = [];
+  List<TodoModel> filterList = [];
+  TextEditingController _controller = TextEditingController();
+
+
 
   @override
   Widget build(BuildContext context) {
 
-    var renderlist = controller.text.isEmpty?list:filterList;
+    var renderlist = _controller.text.isEmpty ? list : filterList;
+
 
     return Scaffold(
-      body: Stack(children: [
-        SingleChildScrollView(
-          child: Column(
-            children: [
-              SizedBox(
-                height: 60,
-              ),
-              ...renderlist
-                  .map((ProductModel element) => ProductItem(element, () {
-                        setState(() {
-                          list.remove(element);
-                        });
-                      }))
-                  .toList()
-            ],
-          ),
-        ),
-        Container(
-          margin: EdgeInsets.all(8),
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.all(Radius.circular(8)),
-              color: Colors.white,
-              boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 25)]),
-          child: TextField(
-            onSubmitted: (value) {
-              filterList.clear();
-              if(value.isEmpty){
-                setState(() {
+      body: Stack(
+        children: [
 
-                });
-                return;
-              }
-              setState(() {
-                list.forEach((e) {
-                  if (e.title.contains(value)) {
-                    filterList.add(e);
-                  }
-                });
-              });
-            },
-            controller: controller,
-            decoration: InputDecoration(
-              prefixIcon: Icon(Icons.search),
-              suffixIcon: IconButton(
-                icon: Icon(Icons.close),
-                onPressed: () {
-                 setState(() {
-                   controller.text = "";
-                   filterList.clear();
-                 });
-                },
-              ),
-              border: InputBorder.none,
-              hintText: "Search",
+          SingleChildScrollView(
+            child: Column(
+              children: [
+                SizedBox(height: 80,),
+
+                ...renderlist.map((TodoModel model) => !model.completed?TodoItem(model):SizedBox()),
+
+                if(_controller.text.isEmpty)
+               ...[ SizedBox(height: 8,),
+                Text("Already Completed",style: TextStyle(fontSize: 12,color: Colors.grey),),
+                Divider()],
+
+                ...renderlist.map((TodoModel model) => model.completed?TodoItem(model):SizedBox()),
+
+              ],
             ),
           ),
-        )
-      ]),
+          Container(
+            margin: EdgeInsets.all(16),
+            decoration: BoxDecoration(
+                color: Colors.white,
+                boxShadow: [BoxShadow(color: Colors.black12,blurRadius: 16)],
+                borderRadius: BorderRadius.circular(8)
+            ),
+            child: TextField(
+              controller: _controller,
+              onChanged: (value){
+                if(_controller.text.isNotEmpty){
+                  setState(() {
+
+                  });
+                }
+              },
+              onSubmitted: (value){
+                setState(() {
+                  filterList.clear();
+                  if(value.isEmpty){
+                    return;
+                  }
+
+                  list.forEach((element) {
+                    if(element.task.contains(value)){
+                      filterList.add(element);
+                    }
+                  });
+                });
+              },
+              decoration: InputDecoration(
+                  hintText: "Search task",
+                  border: InputBorder.none,
+                  prefixIcon: Icon(Icons.search),
+                  suffixIcon: _controller.text.isEmpty?null:IconButton(icon: Icon(Icons.close),onPressed: (){
+                    _controller.text = "";
+                    setState(() {
+
+                    });
+                  },)
+              ),
+            ),
+          ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(child: Icon(Icons.add),onPressed: (){
+        Navigator.push(context, MaterialPageRoute(builder: (context)=>AddTodoScreen()));
+      },),
     );
   }
 }
