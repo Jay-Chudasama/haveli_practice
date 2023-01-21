@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:haveliapp/models/todo_model.dart';
 
 class AddTodoScreen extends StatelessWidget {
-  const AddTodoScreen({Key? key}) : super(key: key);
+
+  Function onAdd;
+
+
+  AddTodoScreen(this.onAdd);
+
+  TextEditingController _controller = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -22,6 +29,7 @@ class AddTodoScreen extends StatelessWidget {
               decoration: BoxDecoration(
                   color: Colors.white, borderRadius: BorderRadius.circular(8)),
               child: TextField(
+                controller: _controller,
                 maxLines: 5,
                 decoration: InputDecoration(
                   hintText: "Type here...",
@@ -42,7 +50,11 @@ class AddTodoScreen extends StatelessWidget {
                           elevation: MaterialStateProperty.all(0)
                         ),
                           onPressed: () {
-                            //  todo
+                            if(_controller.text.isNotEmpty){
+                              TodoModel model = TodoModel(_controller.text);
+                              onAdd(model);
+                            }
+                            Navigator.pop(context);
                           },
                           child: Text(
                             "Add",

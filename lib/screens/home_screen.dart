@@ -12,11 +12,11 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   List<TodoModel> list = [
-    TodoModel("Flutter coding...",true),
-    TodoModel("Dart coding...",false),
-    TodoModel("Object oops coding...",true),
-    TodoModel("JAVA coding...",false),
-    TodoModel("Node js coding...",true),
+    TodoModel("Flutter coding..."),
+    TodoModel("Dart coding..."),
+    TodoModel("Object oops coding..."),
+    TodoModel("JAVA coding..."),
+    TodoModel("Node js coding..."),
   ];
 
   List<TodoModel> filterList = [];
@@ -39,7 +39,11 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 SizedBox(height: 80,),
 
-                ...renderlist.map((TodoModel model) => !model.completed?TodoItem(model):SizedBox()),
+                ...renderlist.map((TodoModel model) => !model.completed?TodoItem.withDone(model,(){
+                  setState(() {
+                    model.completed = true;
+                  });
+                }):SizedBox()),
 
                 if(_controller.text.isEmpty)
                ...[ SizedBox(height: 8,),
@@ -97,7 +101,11 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       floatingActionButton: FloatingActionButton(child: Icon(Icons.add),onPressed: (){
-        Navigator.push(context, MaterialPageRoute(builder: (context)=>AddTodoScreen()));
+        Navigator.push(context, MaterialPageRoute(builder: (context)=>AddTodoScreen((TodoModel model){
+          setState(() {
+            list = [model,...list];
+          });
+        })));
       },),
     );
   }
