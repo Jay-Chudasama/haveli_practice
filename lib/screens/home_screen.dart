@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:haveliapp/mywidgets/todo_item.dart';
+import 'package:haveliapp/repo.dart';
 
-import '../repo.dart';
-
+import '../models/Model.dart';
 
 class HomeScreen extends StatefulWidget {
-  List? list;
 
 
+  List<Model>? list;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -14,64 +15,33 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
 
+
+
+
   @override
   Widget build(BuildContext context) {
 
     if(widget.list==null){
-      Repo.getData().then((res){
-
-
-
+      Repo.getData().then((response){
 
         setState(() {
-          widget.list = res.data.map((element){
-            return {
-              "userId":element["userId"],
-              "id":element["id"],
-              "title":element["title"],
-              "completed":element["completed"],
-            };
+          widget.list = response.data.map<Model>((jsonObject){
+            return Model.fromJson(jsonObject);
           }).toList();
+        });
+      }).catchError((error){
+        print(error);
+        setState(() {
+          widget.list = [];
         });
       });
     }
-
-
     return Scaffold(
-        appBar: AppBar(
-          title: Text("Home"),
-        ),
-        body: widget.list==null? Center(child: Text("Loading..."),) : ListView.builder(
-          itemBuilder: (context, index) => ItemView(widget.list![index]["userId"], widget.list![index]["id"], widget.list![index]["title"], widget.list![index]["completed"]),
-          itemCount: widget.list!.length,
-        ));
-  }
-}
+      appBar: AppBar(title: Text("todos"),),
+      body: widget.list==null? Center(child: CircularProgressIndicator(),) : ListView.builder(itemBuilder: (context,index){
+        return TodoItem(widget.list![index]);
+      },itemCount: widget.list!.length,),
 
-class ItemView extends StatelessWidget {
-
-  int userId,id;
-  String title;
-  bool completed;
-
-
-  ItemView(this.userId, this.id, this.title, this.completed);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.all(8),
-      padding: EdgeInsets.all(8),
-      color: Colors.grey,
-      child: Column(
-        children: [
-          Text("title : $title"),
-          Text("userId : $userId"),
-          Text("id : $id"),
-          Text(completed?"completed":"incomplete"),
-
-        ],
-      ),
     );
   }
 }
