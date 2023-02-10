@@ -1,58 +1,62 @@
 import 'package:flutter/material.dart';
 import 'package:haveliapp/repo.dart';
 
-import '../models/Model.dart';
-
-enum STATUS { init, loading, loaded, failed }
+enum STATUS { init, searching, loaded, failed }
 
 class HomeScreen extends StatefulWidget {
-  STATUS status = STATUS.init;
- late Model model;
-
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  STATUS status = STATUS.init;
+  List list = [];
 
   @override
   Widget build(BuildContext context) {
-    if (widget.status == STATUS.init) {
-      widget.status = STATUS.loading;
-      Repo.getData().then((response) {
-        setState(() {
-          widget.status = STATUS.loaded;
-          widget.model = Model.fromJson(response.data);
-        });
-      }).catchError((error) {
-        setState(() {
-          widget.status = STATUS.failed;
-        });
-      });
-    }
-
     return Scaffold(
-      appBar: widget.status == STATUS.loaded
+      appBar: status != STATUS.searching
           ? AppBar(
-              title: Text(widget.model.name),
+              leading: Icon(Icons.search),
+              title: TextField(
+                onSubmitted: (value) {
+                  if (value.isEmpty) {
+                    return;
+                  }
+
+                  setState(() {
+                    status = STATUS.searching;
+                  });
+
+                  Repo.search(value).then((response) {
+                    setState(() {
+                      status = STATUS.loaded;
+                      list = response.data;
+                    });
+                  }).catchError((error) {
+                    setState(() {
+                      status = STATUS.failed;
+                    });
+                  });
+                },
+              ),
             )
           : null,
-      body: widget.status == STATUS.init || widget.status == STATUS.loading
+      body: status == STATUS.searching
           ? Center(
               child: CircularProgressIndicator(),
             )
-          : widget.status == STATUS.failed
+          : status == STATUS.failed
               ? Center(
-                  child: Text("failed to load data"),
+                  child: Text("Failed"),
                 )
               : ListView.builder(
                   itemBuilder: (context, index) {
                     return ListTile(
-                      title: Text(widget.model.students[index].name),
-                      trailing: Text(widget.model.students[index].age.toString()),
+                      title: Text(list[index]["title"]),
                     );
                   },
-                  itemCount: widget.model.students.length,
+                  itemCount: list.length,
                 ),
     );
   }
