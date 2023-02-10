@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:haveliapp/repo.dart';
 
+import '../models/Model.dart';
+
 enum STATUS { init, loading, loaded, failed }
 
 class HomeScreen extends StatefulWidget {
   STATUS status = STATUS.init;
-  Map<String, dynamic> data = {};
+ late Model model;
 
   @override
   _HomeScreenState createState() => _HomeScreenState();
@@ -20,7 +22,7 @@ class _HomeScreenState extends State<HomeScreen> {
       Repo.getData().then((response) {
         setState(() {
           widget.status = STATUS.loaded;
-          widget.data = response.data;
+          widget.model = Model.fromJson(response.data);
         });
       }).catchError((error) {
         setState(() {
@@ -32,7 +34,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: widget.status == STATUS.loaded
           ? AppBar(
-              title: Text(widget.data["name"]),
+              title: Text(widget.model.name),
             )
           : null,
       body: widget.status == STATUS.init || widget.status == STATUS.loading
@@ -46,11 +48,11 @@ class _HomeScreenState extends State<HomeScreen> {
               : ListView.builder(
                   itemBuilder: (context, index) {
                     return ListTile(
-                      title: Text((widget.data["students"] as List)[index]["name"]),
-                      trailing: Text((widget.data["students"] as List)[index]["age"].toString()),
+                      title: Text(widget.model.students[index].name),
+                      trailing: Text(widget.model.students[index].age.toString()),
                     );
                   },
-                  itemCount: (widget.data["students"] as List).length,
+                  itemCount: widget.model.students.length,
                 ),
     );
   }
