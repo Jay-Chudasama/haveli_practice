@@ -1,47 +1,57 @@
 import 'package:flutter/material.dart';
-import 'package:haveliapp/mywidgets/todo_item.dart';
 import 'package:haveliapp/repo.dart';
 
-import '../models/Model.dart';
+enum STATUS { init, loading, loaded, failed }
 
 class HomeScreen extends StatefulWidget {
-
-
-  List<Model>? list;
+  STATUS status = STATUS.init;
+  Map<String, dynamic> data = {};
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  _HomeScreenState createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
 
-
-
-
   @override
   Widget build(BuildContext context) {
-
-    if(widget.list==null){
-      Repo.getData().then((response){
-
+    if (widget.status == STATUS.init) {
+      widget.status = STATUS.loading;
+      Repo.getData().then((response) {
         setState(() {
-          widget.list = response.data.map<Model>((jsonObject){
-            return Model.fromJson(jsonObject);
-          }).toList();
+          widget.status = STATUS.loaded;
+          widget.data = response.data;
         });
-      }).catchError((error){
-        print(error);
+      }).catchError((error) {
         setState(() {
-          widget.list = [];
+          widget.status = STATUS.failed;
         });
       });
     }
-    return Scaffold(
-      appBar: AppBar(title: Text("todos"),),
-      body: widget.list==null? Center(child: CircularProgressIndicator(),) : ListView.builder(itemBuilder: (context,index){
-        return TodoItem(widget.list![index]);
-      },itemCount: widget.list!.length,),
 
+    return Scaffold(
+      appBar: widget.status == STATUS.loaded
+          ? AppBar(
+              title: Text(widget.data["name"]),
+            )
+          : null,
+      body: widget.status == STATUS.init || widget.status == STATUS.loading
+          ? Center(
+              child: CircularProgressIndicator(),
+            )
+          : widget.status == STATUS.failed
+              ? Center(
+                  child: Text("failed to load data"),
+                )
+              : ListView.builder(
+                  itemBuilder: (context, index) {
+                    return ListTile(
+                      title: Text((widget.data["students"] as List)[index]["name"]),
+                      trailing: Text((widget.data["students"] as List)[index]["age"].toString()),
+                    );
+                  },
+                  itemCount: (widget.data["students"] as List).length,
+                ),
     );
   }
 }
