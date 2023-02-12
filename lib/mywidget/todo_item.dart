@@ -4,8 +4,9 @@ import 'package:haveliapp/models/todo_model.dart';
 
 class TodoItem extends StatelessWidget {
   TodoModel model;
-
-  TodoItem(this.model);
+  Function onPressed;
+  Function onRemove;
+  TodoItem(this.model,this.onPressed,this.onRemove);
 
   @override
   Widget build(BuildContext context) {
@@ -75,11 +76,23 @@ class TodoItem extends StatelessWidget {
               ),
             ),
             Spacer(),
+            Row(
+              children: [
+                TextButton(onPressed: () {
+                onRemove(model.id);
+                }, child: Row(
+                  children: [
+                    Icon(Icons.remove_circle),
+                    Text("Remove")
+                  ],
+                ))
+              ],
+            ),
             model.completed
                 ? SizedBox()
                 : TextButton(
                     onPressed: () {
-                      //todo
+                      onPressed(model.id);
                     },
                     child: Row(
                       children: [

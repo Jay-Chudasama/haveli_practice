@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:haveliapp/models/todo_model.dart';
 import 'package:haveliapp/mywidget/todo_item.dart';
 import 'package:haveliapp/repo.dart';
+import 'package:haveliapp/screens/add_todo.dart';
 
 enum TODOS_STATUS { init, loading, loded, faild }
 
@@ -40,27 +41,34 @@ class _HomeScreenState extends State<HomeScreen> {
       body: status == TODOS_STATUS.init || status == TODOS_STATUS.loading
           ? Center(child: CircularProgressIndicator())
           : status == TODOS_STATUS.faild
-              ? Center(
-                  child: ElevatedButton(
-                      onPressed: () {
-                        setState(() {
-                          status = TODOS_STATUS.init;
-                        });
-                      },
-                      child: Text("TRY AGAIN")),
-                )
-              : ListView.builder(
-                  itemBuilder: (context, index) {
-                    return searchList == null
-                        ? TodoItem(list[index])
-                        : TodoItem(searchList![index]);
-                  },
-                  itemCount:
-                      searchList == null ? list.length : searchList!.length,
-                ),
+          ? Center(
+        child: ElevatedButton(
+            onPressed: () {
+              setState(() {
+                status = TODOS_STATUS.init;
+              });
+            },
+            child: Text("TRY AGAIN")),
+      )
+          : ListView.builder(
+        itemBuilder: (context, index) {
+          return searchList == null
+              ? TodoItem(list[index], onDone,onRemove)
+              : TodoItem(searchList![index], onDone,onRemove);
+        },
+        itemCount:
+        searchList == null ? list.length : searchList!.length,
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          //todo
+          Navigator.push(context, MaterialPageRoute(builder: (context) => AddTodo(),)).then((value) {
+            if(value==ADD_STATUS.newAdded)
+              {
+                setState(() {
+                  loadTodos();
+                });
+              }
+          });
         },
         child: Icon(Icons.add),
       ),
@@ -97,7 +105,7 @@ class _HomeScreenState extends State<HomeScreen> {
       status = TODOS_STATUS.loading;
       Repo.serchTodo(search).then((response) {
         setState(() {
-        status = TODOS_STATUS.loded;
+          status = TODOS_STATUS.loded;
           searchList = response.data.map<TodoModel>((json) {
             return TodoModel.fromJson(json);
           }).toList();
@@ -108,6 +116,26 @@ class _HomeScreenState extends State<HomeScreen> {
         });
         print(error);
       });
+    });
+  }
+
+  void onDone(int id) {
+    Repo.markasComplet(id).then((responce) {
+      setState(() {
+        loadTodos();
+      });
+    }).catchError((error) {
+      print(error);
+    });
+  }
+
+  void onRemove(int id) {
+    Repo.remove(id).then((value) {
+      setState(() {
+        loadTodos();
+      });
+    }).catchError((error) {
+      print(error);
     });
   }
 }
