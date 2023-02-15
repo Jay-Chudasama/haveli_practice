@@ -1,11 +1,15 @@
-import "package:flutter/material.dart";
-import 'package:haveliapp/screen/home_screen.dart';
-import 'package:haveliapp/screen/login_screen.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:haveliapp/screens/home_screen.dart';
 import 'package:haveliapp/utils.dart';
+
+import 'screens/login_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   String? token = await getToken();
+
   runApp(MyApp(token));
 }
 
@@ -21,20 +25,17 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
+
+    reloadMainScreen =(String token){
+      setState(() {
+        widget.token = token;
+      });
+    };
+
     return MaterialApp(
+      title: "ChatApp",
       debugShowCheckedModeBanner: false,
-      title: "haveli app",
-      home: widget.token == null
-          ? LoginScreen((String token) {
-              setState(() {
-                widget.token = token;
-              });
-            })
-          : HomeScreen((){
-            setState(() {
-              widget.token=null;
-            });
-      }),
+      home: widget.token == null ? LoginScreen() : HomeScreen(),
     );
   }
 }

@@ -1,22 +1,26 @@
 import 'package:dio/dio.dart';
 import 'package:haveliapp/utils.dart';
 
-class Repo {
+import 'constants.dart';
 
-  static Future<dynamic> postData(String email, String password) async{
-    var reponce = await Dio().post("http://192.168.1.5:8000/api/login/", data: {
-      'email': email,
-      'password': password,
+class Repo{
+
+
+ static Future<dynamic> login(String email,password) async {
+    var response = await Dio().post("$BASE_URL/api/login/",data: {
+      "email":email,
+      "password":password,
     });
-    return reponce;
+    return response;
   }
 
-  static Future<dynamic> like() async{
-    String token = await getToken();
-    var responce = await Dio().get("http://192.168.1.5:8000/api/like/",options: Options(headers: {
-      'authorization' : token
-    }));
-    return responce;
-  }
+
+ static Future<dynamic> loadUsers() async {
+   String? token = await getToken();
+   var response = await Dio().get("$BASE_URL/api/users/",options: Options(headers: {
+     "Authorization":token
+   }));
+   return response;
+ }
+
 }
-
