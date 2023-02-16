@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:haveliapp/models/user_model.dart';
+import 'package:haveliapp/screens/chat_screen.dart';
 import 'package:haveliapp/screens/users_screen.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -12,7 +14,11 @@ class HomeScreen extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.push(context, MaterialPageRoute(builder: (_)=>UsersScreen()));
+          Navigator.push(context, MaterialPageRoute(builder: (_)=>UsersScreen())).then((model) {
+            if(model!=null){
+              Navigator.push(context, MaterialPageRoute(builder: (context) => ChatScreen(model),));
+            }
+          });
         },
         child: Icon(Icons.chat),
       ),

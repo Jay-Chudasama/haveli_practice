@@ -5,9 +5,7 @@ import 'package:haveliapp/screens/chat_screen.dart';
 import '../constants.dart';
 
 class ChatItem extends StatelessWidget {
-
   UserModel userModel;
-
 
   ChatItem(this.userModel);
 
@@ -15,30 +13,30 @@ class ChatItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => ChatScreen(),));
+        Navigator.pop(context, userModel);
       },
       child: Container(
         margin: EdgeInsets.all(8),
         padding: EdgeInsets.all(16),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          color: Colors.white
-        ),
+            borderRadius: BorderRadius.circular(16), color: Colors.white),
         child: Row(
           children: [
             SizedBox(
               height: 60,
               width: 60,
               child: ClipRRect(
-
-                child: Image.network("$BASE_URL${userModel.image}", height: 60, width: 60),
+                child: Image.network("$BASE_URL${userModel.image}",
+                    height: 60, width: 60),
                 borderRadius: BorderRadius.circular(100),
               ),
             ),
-            SizedBox(width: 16,),
+            SizedBox(
+              width: 16,
+            ),
             Expanded(
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   userModel.username,
@@ -46,8 +44,8 @@ class ChatItem extends StatelessWidget {
                 ),
                 Text(
                   userModel.email,
-                  style:
-                      TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                      color: Colors.grey, fontWeight: FontWeight.bold),
                 )
               ],
             ))

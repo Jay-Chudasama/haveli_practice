@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:haveliapp/models/msg_model.dart';
 
 class Message extends StatelessWidget {
   bool reply = true;
-
+  MsgModel msg;
+  Message(this.msg);
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -19,7 +21,7 @@ class Message extends StatelessWidget {
                   topRight: Radius.circular(25),
                   topLeft: Radius.circular(25))),
           child: Text(
-            "hii",
+            msg.msg,
             style: TextStyle(color: reply ? Colors.blue : Colors.white),
           ),
         ),
