@@ -33,5 +33,11 @@ class Repo {
         options: Options(headers: {"Authorization": token}));
     return response;
   }
+  static Future<dynamic> chatList() async {
+    String? token = await getToken();
+    var response = await Dio().get("$BASE_URL/api/chatlist/",
+        options: Options(headers: {"Authorization": token}));
+    return response;
+  }
 
 }

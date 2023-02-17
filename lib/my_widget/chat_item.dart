@@ -13,7 +13,16 @@ class ChatItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.pop(context, userModel);
+        if (userModel.message == null) {
+          Navigator.pop(context, userModel);
+        }
+        else{
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ChatScreen(userModel),
+              ));
+        }
       },
       child: Container(
         margin: EdgeInsets.all(8),
@@ -43,7 +52,9 @@ class ChatItem extends StatelessWidget {
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 Text(
-                  userModel.email,
+                  userModel.message != null
+                      ? userModel.message!
+                      : userModel.email,
                   style: TextStyle(
                       color: Colors.grey, fontWeight: FontWeight.bold),
                 )

@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:haveliapp/constants.dart';
 import 'package:haveliapp/models/msg_model.dart';
 import 'package:haveliapp/models/user_model.dart';
@@ -7,11 +8,15 @@ import 'package:haveliapp/my_widget/message.dart';
 import 'package:haveliapp/repo.dart';
 import 'package:haveliapp/utils.dart';
 
+enum STATES { init, loading, loaded, failed }
+
 class ChatScreen extends StatefulWidget {
   UserModel userModel;
   List<MsgModel> list = [];
 
   ChatScreen(this.userModel);
+
+  STATES states = STATES.init;
 
   @override
   State<ChatScreen> createState() => _ChatScreenState();
@@ -23,6 +28,15 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.states == STATES.init) {
+      loadChat();
+    }
+    if (widget.states == STATES.loaded) {
+      Future.delayed(
+        Duration(seconds: 3),
+        () => loadChat(),
+      );
+    }
     return Scaffold(
       backgroundColor: Colors.grey.shade100,
       appBar: AppBar(
@@ -68,8 +82,9 @@ class _ChatScreenState extends State<ChatScreen> {
           Expanded(
             child: ListView.builder(
               controller: _scrollController,
+              reverse: true,
               itemBuilder: (context, index) {
-                return Message(widget.list[index]);
+                return Message(widget.list[index], widget.userModel.id);
               },
               itemCount: widget.list.length,
             ),
@@ -78,11 +93,7 @@ class _ChatScreenState extends State<ChatScreen> {
             color: Colors.grey,
             padding: EdgeInsets.all(8),
             child: TextField(
-              onChanged: (value) {
-                setState(() {
 
-                });
-              },
               controller: _controller,
               decoration: InputDecoration(
                 hintText: "type hear....",
@@ -117,10 +128,8 @@ class _ChatScreenState extends State<ChatScreen> {
   void sendMsg() {
     Repo.sendMsg(widget.userModel.id, _controller.text).then((response) {
       print(response);
-      setState(() {
-        loadChat();
-        _controller.text = "";
-      });
+      _controller.clear();
+      loadChat();
     }).catchError((error) {
       print(error);
       if (error.response != null) {
@@ -137,12 +146,20 @@ class _ChatScreenState extends State<ChatScreen> {
   void loadChat() {
     Repo.loadChat(widget.userModel.id).then((response) {
       print(response);
-      widget.list = response.data.map<MsgModel>((json) {
-        return MsgModel.fromJson(json);
-      }).toList();
-      _scrollController.animateTo(_scrollController.position.maxScrollExtent,
-          duration: Duration(milliseconds: 200), curve: Curves.easeInOut);
+      setState(() {
+        int oldlenth= widget.list.length;
+        widget.states = STATES.loaded;
+        widget.list = response.data.map<MsgModel>((json) {
+          return MsgModel.fromJson(json);
+        }).toList();
+        if(oldlenth!= widget.list.length){
+          scrollEnd();
+        }
+      });
     }).catchError((error) {
+      setState(() {
+        widget.states = STATES.failed;
+      });
       print(error);
       if (error.response != null) {
         if (error.response.statusCode == 403) {
@@ -153,5 +170,11 @@ class _ChatScreenState extends State<ChatScreen> {
         }
       }
     });
+  }
+
+  void scrollEnd() {
+    _scrollController.jumpTo(20);
+    _scrollController.animateTo(0,
+        duration: Duration(milliseconds: 200), curve: Curves.easeOut);
   }
 }

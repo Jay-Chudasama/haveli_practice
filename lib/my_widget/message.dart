@@ -4,7 +4,12 @@ import 'package:haveliapp/models/msg_model.dart';
 class Message extends StatelessWidget {
   bool reply = true;
   MsgModel msg;
-  Message(this.msg);
+  int chatwithid;
+
+  Message(this.msg, this.chatwithid) {
+    reply = msg.user != chatwithid;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Row(
