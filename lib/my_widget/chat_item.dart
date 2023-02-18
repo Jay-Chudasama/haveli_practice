@@ -35,7 +35,7 @@ class ChatItem extends StatelessWidget {
               height: 60,
               width: 60,
               child: ClipRRect(
-                child: Image.network("$BASE_URL${userModel.image}",
+                child: userModel.image== null ?Icon(Icons.person):Image.network("$BASE_URL${userModel.image}",
                     height: 60, width: 60),
                 borderRadius: BorderRadius.circular(100),
               ),

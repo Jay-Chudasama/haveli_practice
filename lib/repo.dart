@@ -26,6 +26,7 @@ class Repo {
         options: Options(headers: {"Authorization": token}));
     return response;
   }
+
   static Future<dynamic> loadChat(int id) async {
     String? token = await getToken();
     var response = await Dio().get("$BASE_URL/api/loadchat/",
@@ -33,6 +34,7 @@ class Repo {
         options: Options(headers: {"Authorization": token}));
     return response;
   }
+
   static Future<dynamic> chatList() async {
     String? token = await getToken();
     var response = await Dio().get("$BASE_URL/api/chatlist/",
@@ -40,4 +42,25 @@ class Repo {
     return response;
   }
 
+  static Future<dynamic> SighUp(String username, email, password) async {
+    var response = await Dio().post("$BASE_URL/api/signup/", data: {
+      "username": username,
+      "email": email,
+      "password": password,
+    });
+    return response;
+  }
+
+  static Future<dynamic> imageload() async {
+    String? token = await getToken();
+    var response = await Dio().get("$BASE_URL/api/userdata/",
+        options: Options(headers: {"Authorization": token}));
+    return response;
+  }
+  static Future<dynamic> logout() async {
+    String? token = await getToken();
+    var response = await Dio().get("$BASE_URL/api/logout/",
+        options: Options(headers: {"Authorization": token}));
+    return response;
+  }
 }

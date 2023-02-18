@@ -1,39 +1,42 @@
 import 'package:dio/dio.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:haveliapp/repo.dart';
-import 'package:haveliapp/screens/sign_up.dart';
 import 'package:haveliapp/utils.dart';
+
+import '../models/user_model.dart';
 
 enum STATES { init, submitting, loggedIn, failed }
 
-class LoginScreen extends StatefulWidget {
-  LoginScreen();
-
+class SignUpScreen extends StatefulWidget {
   @override
-  _LoginScreenState createState() => _LoginScreenState();
-
-  var formkey = GlobalKey<FormState>();
-  bool showPassword = false;
-
-  String email = "";
-  String password = "";
-  String? emailError, passwordError;
-
-  STATES status = STATES.init;
+  State<SignUpScreen> createState() => _SignUpScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _SignUpScreenState extends State<SignUpScreen> {
+  var formkey = GlobalKey<FormState>();
+
+  bool showPassword = false;
+
+  String username = "";
+
+  String email = "";
+
+  String password = "";
+
+  String? emailError, passwordError, usernameerror;
+
+  STATES status = STATES.init;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
-      body: SingleChildScrollView(
+      body:SingleChildScrollView(
         child: Container(
           margin: EdgeInsets.only(top: 50),
           padding: EdgeInsets.all(24),
           child: Form(
-            key: widget.formkey,
+            key: formkey,
             child: Column(
               children: [
                 Image.asset(
@@ -45,14 +48,47 @@ class _LoginScreenState extends State<LoginScreen> {
                   height: 48,
                 ),
                 TextFormField(
-                  enabled: widget.status != STATES.submitting,
+                  enabled: status != STATES.submitting,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return "Required";
+                    }
+                    if(validUser(value)) {
+                      username = value;
+                    }
+                    else{
+                      return "invalid user name";
+                    }
+                  },
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide.none),
+                    errorBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: Colors.redAccent)),
+                    hintText: "User name",
+                    errorText: usernameerror,
+                    prefixIcon: Icon(
+                      Icons.person,
+                      color: Colors.black,
+                    ),
+                    fillColor: Colors.white,
+                    filled: true,
+                  ),
+                ),
+                SizedBox(
+                  height: 32,
+                ),
+                TextFormField(
+                  enabled: status != STATES.submitting,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return "Required";
                     }
 
                     if (validEmail(value)) {
-                      widget.email = value;
+                      email = value;
                     } else {
                       return "Inavalid Email Address";
                     }
@@ -65,7 +101,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         borderRadius: BorderRadius.circular(8),
                         borderSide: BorderSide(color: Colors.redAccent)),
                     hintText: "Email address",
-                    errorText: widget.emailError,
+                    errorText: emailError,
                     prefixIcon: Icon(
                       Icons.email,
                       color: Colors.black,
@@ -75,10 +111,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
                 SizedBox(
-                  height: 24,
+                  height: 32,
                 ),
                 TextFormField(
-                  enabled: widget.status != STATES.submitting,
+                  enabled: status != STATES.submitting,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return "Required";
@@ -88,11 +124,11 @@ class _LoginScreenState extends State<LoginScreen> {
                       return "Incorrect Password!";
                     }
 
-                    widget.password = value;
+                    password = value;
                   },
-                  obscureText: widget.showPassword,
+                  obscureText: showPassword,
                   decoration: InputDecoration(
-                      errorText: widget.passwordError,
+                      errorText: passwordError,
                       border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
                           borderSide: BorderSide.none),
@@ -108,14 +144,14 @@ class _LoginScreenState extends State<LoginScreen> {
                       filled: true,
                       suffixIcon: IconButton(
                         icon: Icon(
-                          !widget.showPassword
+                          showPassword
                               ? Icons.visibility_off
                               : Icons.visibility,
                           color: Colors.black,
                         ),
                         onPressed: () {
                           setState(() {
-                            widget.showPassword = !widget.showPassword;
+                            showPassword = !showPassword;
                           });
                         },
                       )),
@@ -123,7 +159,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 SizedBox(
                   height: 32,
                 ),
-                if (widget.status == STATES.submitting)
+                if (status == STATES.submitting)
                   SizedBox(
                     child: LinearProgressIndicator(),
                     width: 80,
@@ -132,31 +168,14 @@ class _LoginScreenState extends State<LoginScreen> {
                   height: 32,
                 ),
                 ElevatedButton(
-                  onPressed: widget.status == STATES.submitting
-                      ? null
-                      : () {
-                          if (widget.formkey.currentState!.validate()) {
-                            login();
-                          }
-                        },
-                  child: Text("Login"),
+                  onPressed: () {if (formkey.currentState!.validate()) {
+                    Signup();
+                  }},
+                  child: Text("Sign Up"),
                   style: ElevatedButton.styleFrom(
                     minimumSize: Size.fromHeight(
                         40), // fromHeight use double.infinity as width and 40 is the height
                   ),
-                ),
-                Row(
-                  children: [
-                    TextButton(
-                      onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => SignUpScreen()));
-                      },
-                      child: Text("sing up"),
-                    )
-                  ],
                 )
               ],
             ),
@@ -165,31 +184,30 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
     );
   }
-
-  void login() {
-    setState(() {
-      widget.status = STATES.submitting;
-      Repo.login(widget.email, widget.password).then((response) {
-        String token = response.data["token"];
-        storeToken(token)
-            .then((value) => reloadMainScreen!(token))
-            .catchError((error) => print(error));
-      }).catchError((error) {
-        if (error.type == DioErrorType.connectTimeout) {
-          ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text("Connection TimeOut")));
-        }
-
-        if (error.response != null) {
-          setState(() {
-            widget.status = STATES.init;
-            widget.emailError =
-                error.response!.statusCode == 404 ? "user not found" : null;
-            widget.passwordError =
-                error.response!.statusCode == 400 ? "incorrect password" : null;
-          });
-        }
-      });
+  void Signup(){
+    Repo.SighUp(username, email, password).then((response){
+      print(response);
+      String token = response.data["token"];
+      storeToken(token)
+          .then((value) {
+            Navigator.pop(context);
+        reloadMainScreen!(token);
+      })
+          .catchError((error) => print(error));
+    }).catchError((error){
+      print(error);
+      if (error.type == DioErrorType.connectTimeout) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text("Connection TimeOut")));
+      }
+      if (error.response != null) {
+        setState(() {
+          status = STATES.init;
+          usernameerror=error.response!.data == "username_already_exists" ? "username already exists" : null;
+          emailError =
+          error.response!.data == "email_already_exists" ? "email already exists" : null;
+        });
+      }
     });
   }
 }

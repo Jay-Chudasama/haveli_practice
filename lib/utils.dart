@@ -6,6 +6,9 @@ bool validEmail(String email) {
       .hasMatch(email);
 }
 
+bool validUser(String username) {
+  return RegExp("^[A-Za-z][A-Za-z0-9_]{7,29}").hasMatch(username);
+}
 
 final storage = FlutterSecureStorage();
 
@@ -14,14 +17,13 @@ Future<void> storeToken(String token) async {
 }
 
 Future<String> getToken() async {
-  String token =  await storage.read(key: "token");
+  String token = await storage.read(key: "token");
   print(token);
   return token;
 }
 
-Future<void> deletToken()async{
+Future<void> deletToken() async {
   await storage.delete(key: "token");
 }
-
 
 Function? reloadMainScreen;

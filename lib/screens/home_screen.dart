@@ -3,7 +3,10 @@ import 'package:haveliapp/models/user_model.dart';
 import 'package:haveliapp/my_widget/chat_item.dart';
 import 'package:haveliapp/repo.dart';
 import 'package:haveliapp/screens/chat_screen.dart';
+import 'package:haveliapp/screens/login_screen.dart';
+import 'package:haveliapp/screens/profilescreen.dart';
 import 'package:haveliapp/screens/users_screen.dart';
+import 'package:haveliapp/utils.dart';
 
 enum STATE { init, loading, loded, failed }
 
@@ -23,7 +26,18 @@ class _HomeScreenState extends State<HomeScreen> {
     }
     return Scaffold(
       appBar: AppBar(
-        title: Text("Chats"),
+        title: Row(
+          children: [
+            Text("Chat Screen"),
+            Spacer(),
+            IconButton(
+              onPressed: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context)=>ProfileScreen()));
+              },
+              icon: Icon(Icons.person),
+            )
+          ],
+        ),
       ),
       body: ListView.builder(
         itemBuilder: (context, index) {
@@ -55,7 +69,7 @@ class _HomeScreenState extends State<HomeScreen> {
     Repo.chatList().then((response) {
       setState(() {
         widget.status = STATE.loded;
-        widget.list = response.data.map<UserModel>((object){
+        widget.list = response.data.map<UserModel>((object) {
           return UserModel.fromJson(object);
         }).toList();
       });

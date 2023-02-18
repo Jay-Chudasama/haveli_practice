@@ -13,6 +13,7 @@ enum STATES { init, loading, loaded, failed }
 class ChatScreen extends StatefulWidget {
   UserModel userModel;
   List<MsgModel> list = [];
+  bool sendingMsg = false;
 
   ChatScreen(this.userModel);
 
@@ -31,11 +32,20 @@ class _ChatScreenState extends State<ChatScreen> {
     if (widget.states == STATES.init) {
       loadChat();
     }
-    if (widget.states == STATES.loaded) {
+    if (widget.states == STATES.loaded && !widget.sendingMsg) {
       Future.delayed(
         Duration(seconds: 3),
-        () => loadChat(),
+        () {
+          if (!widget.sendingMsg) {
+            loadChat();
+          }
+        },
       );
+    }else{
+      setState(() {
+
+      widget.sendingMsg = false;
+      });
     }
     return Scaffold(
       backgroundColor: Colors.grey.shade100,
@@ -51,7 +61,7 @@ class _ChatScreenState extends State<ChatScreen> {
           children: [
             SizedBox(
               width: 40,
-              child: ClipRRect(
+              child: widget.userModel.image== null ?Icon(Icons.person,color: Colors.black):ClipRRect(
                 child: Image.network(
                   "$BASE_URL${widget.userModel.image}",
                   height: 40,
@@ -93,7 +103,6 @@ class _ChatScreenState extends State<ChatScreen> {
             color: Colors.grey,
             padding: EdgeInsets.all(8),
             child: TextField(
-
               controller: _controller,
               decoration: InputDecoration(
                 hintText: "type hear....",
@@ -105,11 +114,11 @@ class _ChatScreenState extends State<ChatScreen> {
                   borderRadius: BorderRadius.circular(24),
                 ),
                 suffixIcon: IconButton(
-                  onPressed: _controller.text.isEmpty
-                      ? null
-                      : () {
-                          sendMsg();
-                        },
+                  onPressed: () {
+                    if (_controller.text.isNotEmpty) {
+                      sendMsg();
+                    }
+                  },
                   icon: Icon(
                     Icons.send,
                     size: 24,
@@ -127,9 +136,9 @@ class _ChatScreenState extends State<ChatScreen> {
 
   void sendMsg() {
     Repo.sendMsg(widget.userModel.id, _controller.text).then((response) {
-      print(response);
       _controller.clear();
-      loadChat();
+      widget.sendingMsg = true;
+      loadChat(fromMsg: true);
     }).catchError((error) {
       print(error);
       if (error.response != null) {
@@ -143,19 +152,24 @@ class _ChatScreenState extends State<ChatScreen> {
     });
   }
 
-  void loadChat() {
+  void loadChat({bool fromMsg: false}) {
+    print("requested");
+    widget.states = STATES.loading;
     Repo.loadChat(widget.userModel.id).then((response) {
-      print(response);
+      if (!fromMsg && widget.sendingMsg) {
+        return;
+      }
       setState(() {
-        int oldlenth= widget.list.length;
-        widget.states = STATES.loaded;
+        int oldlenth = widget.list.length;
         widget.list = response.data.map<MsgModel>((json) {
           return MsgModel.fromJson(json);
         }).toList();
-        if(oldlenth!= widget.list.length){
+        if (oldlenth != widget.list.length) {
           scrollEnd();
         }
+      widget.states = STATES.loaded;
       });
+
     }).catchError((error) {
       setState(() {
         widget.states = STATES.failed;
