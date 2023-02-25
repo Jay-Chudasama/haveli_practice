@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:haveliapp/home/home_state.dart';
 import 'home_cubit.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -15,13 +16,16 @@ class HomeScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          BlocBuilder<HomeCubit,int>(
-            builder: (context,int state) {
-
-              return Text(
-                "count : $state",
-                style: TextStyle(fontSize: 20),
-              );
+          BlocBuilder<HomeCubit, HomeState>(
+            builder: (context, HomeState state) {
+              if (state is Counter) {
+                return Text(
+                  "count : ${state.count}",
+                  style: TextStyle(fontSize: 20),
+                );
+              }else{
+                return Text("NONE");
+              }
             },
           ),
           Row(
