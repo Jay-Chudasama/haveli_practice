@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:haveliapp/screens/home_screen.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import 'home/home_cubit.dart';
+import 'home/home_screen.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-
+  const MyApp({super.key});
 
   // This widget is the root of your application.
   @override
@@ -17,7 +20,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: HomeScreen()
+      home: BlocProvider(create: (_) => HomeCubit(), child: HomeScreen()),
     );
   }
 }
