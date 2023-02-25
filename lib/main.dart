@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: BlocProvider(create: (_) => HomeCubit(), child: HomeScreen()),
+      home: ,
     );
   }
 }
