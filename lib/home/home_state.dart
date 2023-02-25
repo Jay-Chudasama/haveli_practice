@@ -1,7 +1,13 @@
-abstract class HomeState{}
+abstract class HomeState {}
 
-class Counter extends HomeState{
-  int count;
+class Init extends HomeState {}
 
-  Counter(this.count);
+class Loading extends HomeState {}
+
+class Loaded extends HomeState {
+  String joke;
+
+  Loaded(this.joke);
 }
+
+class Failed extends HomeState {}

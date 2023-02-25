@@ -1,32 +1,19 @@
-
-
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:haveliapp/home/home_repo.dart';
 
 import 'home_state.dart';
 
-class HomeCubit extends Cubit<HomeState>{
+class HomeCubit extends Cubit<HomeState> {
+  HomeCubit() : super(Init());
+  HomeRepo repo = HomeRepo();
 
-
-  HomeCubit() : super(Counter(0));
-
-
-  void add(){
-
-    int count = (state as Counter).count + 1;
-    emit(Counter(count));
-
+  void loadJoke() {
+    emit(Loading());
+    repo.loadJoke().then((response) {
+      String joke = response.data["setup"];
+      emit(Loaded(joke));
+    }).catchError((error) {
+      emit(Failed());
+    });
   }
-
-
-  void remove(){
-    int count = (state as Counter).count - 1;
-    emit(Counter(count));
-
-
-  }
-
-
-
-
-
 }
