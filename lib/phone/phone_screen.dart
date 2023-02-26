@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:haveliapp/otp/otp_cubit.dart';
+import 'package:haveliapp/otp/otp_screen.dart';
 import 'package:haveliapp/phone/phone_cubit.dart';
 import 'package:haveliapp/phone/phone_state.dart';
 
 class PhoneScreen extends StatefulWidget {
   bool enableButton = false;
-  String phoneno= "";
+  String phoneno = "";
 
   @override
   State<PhoneScreen> createState() => _PhoneScreenState();
@@ -18,6 +20,16 @@ class _PhoneScreenState extends State<PhoneScreen> {
     return Scaffold(
       body: BlocConsumer<PhoneCubit, PhoneState>(
         listener: (context, state) {
+          if (state is Submited) {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => BlocProvider(
+                    create: (context) => OtpCubit(),
+                    child: OtpScreen(widget.phoneno),
+                  ),
+                ));
+          }
           if (state is Failed) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -86,7 +98,8 @@ class _PhoneScreenState extends State<PhoneScreen> {
                   onPressed: stat is Submiting || !widget.enableButton
                       ? null
                       : () {
-                          BlocProvider.of<PhoneCubit>(context).getOtp(widget.phoneno);
+                          BlocProvider.of<PhoneCubit>(context)
+                              .getOtp(widget.phoneno);
                         },
                   child: Text(
                     "GET OTP",
