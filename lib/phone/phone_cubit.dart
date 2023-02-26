@@ -1,4 +1,3 @@
-import 'dart:html';
 
 import 'package:dio/dio.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -9,9 +8,9 @@ class PhoneCubit extends Cubit<PhoneState> {
   PhoneCubit() : super(Init());
   PhoneRepo phonerepo = PhoneRepo();
 
-  void getOtp() {
+  void getOtp(String phone) {
     emit(Submiting());
-    phonerepo.getOtpApi().then((response) {
+    phonerepo.getOtpApi(phone).then((response) {
       emit(Submited());
     }).catchError(
       (value) {
@@ -23,7 +22,7 @@ class PhoneCubit extends Cubit<PhoneState> {
             emit(Failed(error.response!.data['detail']));
           }
         } else {
-          if (error.type == DioErrorType.connectionTimeout) {
+          if (error.type == DioErrorType.unknown) {
             emit(Failed("Please check your internt connection"));
           } else {
             emit(Failed(error.message));

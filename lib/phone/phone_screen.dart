@@ -4,13 +4,28 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:haveliapp/phone/phone_cubit.dart';
 import 'package:haveliapp/phone/phone_state.dart';
 
-class PhoneScreen extends StatelessWidget {
-  PhoneScreen({Key? key}) : super(key: key);
+class PhoneScreen extends StatefulWidget {
+  bool enableButton = false;
+  String phoneno= "";
 
+  @override
+  State<PhoneScreen> createState() => _PhoneScreenState();
+}
+
+class _PhoneScreenState extends State<PhoneScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: BlocBuilder<PhoneCubit, PhoneState>(
+      body: BlocConsumer<PhoneCubit, PhoneState>(
+        listener: (context, state) {
+          if (state is Failed) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.msg!),
+              ),
+            );
+          }
+        },
         builder: (_, PhoneState stat) => Padding(
           padding: EdgeInsets.symmetric(horizontal: 25),
           child: Column(
@@ -27,6 +42,12 @@ class PhoneScreen extends StatelessWidget {
                 height: 80,
               ),
               TextField(
+                onChanged: (value) {
+                  setState(() {
+                    widget.enableButton = value.length == 10;
+                    widget.phoneno = value;
+                  });
+                },
                 keyboardType: TextInputType.number,
                 enabled: !(stat is Submiting),
                 inputFormatters: [FilteringTextInputFormatter.digitsOnly],
@@ -62,10 +83,10 @@ class PhoneScreen extends StatelessWidget {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.black,
                   ),
-                  onPressed: stat is Submiting
+                  onPressed: stat is Submiting || !widget.enableButton
                       ? null
                       : () {
-                          BlocProvider.of<PhoneCubit>(context).getOtp();
+                          BlocProvider.of<PhoneCubit>(context).getOtp(widget.phoneno);
                         },
                   child: Text(
                     "GET OTP",
