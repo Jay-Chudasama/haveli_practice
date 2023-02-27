@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:haveliapp/home/home_cubit.dart';
+import 'package:haveliapp/home/home_screen.dart';
 import 'package:haveliapp/phone/phone_cubit.dart';
 import 'package:haveliapp/phone/phone_screen.dart';
 import 'package:haveliapp/profile/profile_cubit.dart';
@@ -25,8 +27,8 @@ class MyApp extends StatelessWidget {
           primarySwatch: Colors.blue,
         ),
         home: BlocProvider(
-          create: (context) => PhoneCubit(),
-          child: PhoneScreen(),
+          create: (context) => HomeCubit(),
+          child: HomeScreen(),
         ));
   }
 }
