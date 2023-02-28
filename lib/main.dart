@@ -1,17 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:haveliapp/auth/auth_cubit.dart';
+import 'package:haveliapp/auth/auth_state.dart';
 import 'package:haveliapp/home/home_cubit.dart';
 import 'package:haveliapp/home/home_screen.dart';
 import 'package:haveliapp/phone/phone_cubit.dart';
 import 'package:haveliapp/phone/phone_screen.dart';
-import 'package:haveliapp/profile/profile_cubit.dart';
-import 'package:haveliapp/profile/profile_screen.dart';
+import 'package:haveliapp/utils.dart';
 
 import 'mock_adapter.dart';
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   mockResponseAdapter();
+
+
+  try {
+    await getToken();
+  }catch(err){
+  //  do nothing
+  }
+
+  if(TOKEN!=null) {
+    await authCubit.loadUserDetails();
+  }
+
+  runApp(BlocProvider(
+    create: (context) => authCubit,
+    child: MyApp(),
+  ));
 }
 
 class MyApp extends StatelessWidget {
@@ -26,9 +43,36 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        home: BlocProvider(
-          create: (context) => HomeCubit(),
-          child: HomeScreen(),
+        home: BlocConsumer<AuthCubit, AuthState>(
+          listener: (context, state) {
+            //  todo
+          },
+          builder: (context, state) {
+            if (state is Authenticated) {
+              return BlocProvider(
+                create: (context) => HomeCubit(),
+                child: HomeScreen(),
+              );
+            }
+
+            if (state is Failed) {
+              return Scaffold(
+                body: Center(
+                  child: ElevatedButton(
+                    child: Text("Retry"),
+                    onPressed: () {
+                      BlocProvider.of<AuthCubit>(context).loadUserDetails();
+                    },
+                  ),
+                ),
+              );
+            }
+
+            return BlocProvider(
+              create: (context) => PhoneCubit(),
+              child: PhoneScreen(),
+            );
+          },
         ));
   }
 }

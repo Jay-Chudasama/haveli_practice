@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:haveliapp/otp/otp_repo.dart';
 import 'package:haveliapp/otp/otp_state.dart';
+import 'package:haveliapp/utils.dart';
 
 class OtpCubit extends Cubit<OtpState> {
   OtpCubit() : super(Init());
@@ -10,9 +11,17 @@ class OtpCubit extends Cubit<OtpState> {
   void verifyOtp(String otp) {
     emit(Submiting());
     otprepo.verifyOtp(otp).then((response) {
-      emit(Verifyed());
+      String token = response.data['token'];
 
-      //todo
+      storeToken(token).then((value) {
+
+        emit(Verifyed());
+      }).catchError((err){
+      //  do nothing
+      });
+
+
+
     }).catchError((value) {
       DioError error = value;
       if (error.response != null) {

@@ -1,3 +1,5 @@
+import 'package:haveliapp/utils.dart';
+
 import '../constant.dart';
 
 class ProfileRepo{

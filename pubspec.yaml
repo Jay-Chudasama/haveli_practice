@@ -40,6 +40,7 @@ dependencies:
   dio: ^5.0.1
   flutter_otp_text_field: ^1.1.0+2
   image_picker: ^0.8.6+3
+  flutter_secure_storage: ^8.0.0
 
 dev_dependencies:
   flutter_test:
@@ -52,7 +53,15 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^2.0.0
   http_mock_adapter: ^0.4.2
+  flutter_launcher_icons: ^0.12.0
 
+
+
+flutter_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/images/logo.png"
+  min_sdk_android: 18 # android min sdk min:16, default 21
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 

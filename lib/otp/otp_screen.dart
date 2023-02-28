@@ -8,6 +8,8 @@ import 'package:haveliapp/otp/otp_state.dart';
 import 'package:haveliapp/profile/profile_cubit.dart';
 import 'package:haveliapp/profile/profile_screen.dart';
 
+import '../auth/auth_cubit.dart';
+
 class OtpScreen extends StatefulWidget {
   String phone;
 
@@ -31,6 +33,16 @@ class _OtpScreenState extends State<OtpScreen> {
   }
 
   @override
+  void dispose() {
+    // TODO: implement dispose
+    if(timer!=null){
+
+    timer!.cancel();
+    }
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SingleChildScrollView(
@@ -43,6 +55,8 @@ class _OtpScreenState extends State<OtpScreen> {
                     .showSnackBar(SnackBar(content: Text(state.msg!)));
               }
               if (state is Verifyed) {
+                BlocProvider.of<AuthCubit>(context).loadUserDetails();
+                Navigator.popUntil(context, (route) => route.isFirst);
                 Navigator.push(
                     context,
                     MaterialPageRoute(
