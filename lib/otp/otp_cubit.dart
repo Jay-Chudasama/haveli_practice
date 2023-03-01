@@ -8,9 +8,9 @@ class OtpCubit extends Cubit<OtpState> {
   OtpCubit() : super(Init());
   OtpRepo otprepo = OtpRepo();
 
-  void verifyOtp(String otp) {
+  void verifyOtp(String phone,String otp) {
     emit(Submiting());
-    otprepo.verifyOtp(otp).then((response) {
+    otprepo.verifyOtp(phone,otp).then((response) {
       String token = response.data['token'];
 
       storeToken(token).then((value) {

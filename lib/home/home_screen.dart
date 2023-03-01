@@ -30,13 +30,13 @@ class HomeScreen extends StatelessWidget {
                     MaterialPageRoute(
                         builder: (_) => BlocProvider(
                               create: (_) => ProfileCubit(),
-                              child: ProfileScreen(),
+                              child: ProfileScreen(showLogout: true,),
                             )));
               },
               icon: userdata.image==null ?Icon(Icons.account_circle): ClipRRect(
                 borderRadius: BorderRadius.circular(100),
                 child: Image.network(
-                  userdata.image,
+                 BASE_URL+ userdata.image!,
                   height: 30,
                   width: 30,
                   fit: BoxFit.cover,

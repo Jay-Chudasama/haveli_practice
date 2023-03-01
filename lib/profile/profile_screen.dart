@@ -12,8 +12,15 @@ import '../auth/auth_cubit.dart';
 import '../models/user_model.dart';
 
 class ProfileScreen extends StatefulWidget {
+
+  bool showLogout = false;
+
+
+  ProfileScreen({this.showLogout = false});
+
   final ImagePicker _picker = ImagePicker();
   XFile? image;
+  File? file;
   String username = "";
   late User userdata;
 
@@ -63,15 +70,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             size: 150,
                             color: Colors.grey,
                           )
-                        : widget.image != null
+                        : widget.file != null
                             ? Image.file(
-                                File(widget.image!.path),
+                               widget.file!,
                                 height: 120,
                                 width: 120,
                                 fit: BoxFit.cover,
                               )
                             : Image.network(
-                                widget.userdata.image,
+                                BASE_URL+widget.userdata.image!,
                                 height: 120,
                                 width: 120,
                                 fit: BoxFit.cover,
@@ -122,10 +129,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       onPressed: enableButton
                           ? () {
                               BlocProvider.of<ProfileCubit>(context)
-                                  .updateProfile(widget.username);
+                                  .updateProfile(widget.username,widget.file);
                             }
                           : null,
                       child: Text("DONE")),
+                ),
+                SizedBox(height: 20,),
+                if (widget.showLogout)
+                SizedBox(
+                  width: double.infinity,
+                  height: 50,
+                  child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                      ),
+                      onPressed: () {
+                        BlocProvider.of<ProfileCubit>(context)
+                            .logout();
+                        Navigator.pop(context);
+                      }
+                      ,
+                      child: Text("LOGOUT")),
                 )
               ],
             ),
@@ -137,6 +161,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   void pickImage() async {
     widget.image = await widget._picker.pickImage(source: ImageSource.gallery);
+    widget.file =  File(widget.image!.path);
     setState(() {});
   }
 }

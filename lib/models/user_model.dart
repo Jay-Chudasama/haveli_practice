@@ -1,7 +1,7 @@
 class User{
 
   late int id;
-  late String name,image,phone;
+  late String? name,image,phone;
 
   User.fromJson(dynamic json){
     id = json['id'];

@@ -20,7 +20,7 @@ class AuthCubit extends Cubit<AuthState> {
       print(value);
       DioError error = value as DioError;
       if (error.response != null) {
-        if (error.response!.statusCode == 401) {
+        if (error.response!.statusCode == 401 || error.response!.statusCode == 403) {
           emit(UnAuthenticated());
           deletToken();
         } else {

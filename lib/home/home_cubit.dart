@@ -22,7 +22,7 @@ class HomeCubit extends Cubit<HomeState> {
     }).catchError((value) {
       DioError error = value;
       if (error.response != null) {
-        if (error.response!.statusCode == 401) {
+        if (error.response!.statusCode == 401 || error.response!.statusCode == 403) {
           deletToken();
           authCubit.emit(AuthState.UnAuthenticated());
           emit(Failed(UNAUTHENTICATED));

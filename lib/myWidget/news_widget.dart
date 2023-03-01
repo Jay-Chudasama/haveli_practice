@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:haveliapp/constant.dart';
 import 'package:haveliapp/models/news_model.dart';
 import 'package:haveliapp/news_detail/news_detaill.dart';
 
@@ -19,7 +20,7 @@ NewsWidget(this.model);
           child: Stack(
             children: [
               Image.network(
-                model.image,
+                BASE_URL+model.image,
                 height: 200,
                 fit: BoxFit.cover,
                 width: double.infinity,

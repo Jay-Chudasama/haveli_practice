@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:haveliapp/constant.dart';
 import 'package:haveliapp/models/news_model.dart';
 
 class NewsDetail extends StatelessWidget {
@@ -18,7 +19,7 @@ NewsDetail(this.model);
               width: double.infinity,
 
               child: Image.network(
-                model.image,
+                BASE_URL+model.image,
                 height: 200,
                 width: double.infinity,
                 fit: BoxFit.cover,

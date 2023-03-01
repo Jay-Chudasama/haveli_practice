@@ -49,13 +49,13 @@ class _OtpScreenState extends State<OtpScreen> {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
           child: BlocConsumer<OtpCubit, OtpState>(
-            listener: (context, state) {
+            listener: (context, state) async {
               if (state is FAiled) {
                 ScaffoldMessenger.of(context)
                     .showSnackBar(SnackBar(content: Text(state.msg!)));
               }
               if (state is Verifyed) {
-                BlocProvider.of<AuthCubit>(context).loadUserDetails();
+                await BlocProvider.of<AuthCubit>(context).loadUserDetails();
                 Navigator.popUntil(context, (route) => route.isFirst);
                 Navigator.push(
                     context,
@@ -138,7 +138,7 @@ class _OtpScreenState extends State<OtpScreen> {
                       onPressed: !enableButton || state is Submiting
                           ? null
                           : () {
-                              BlocProvider.of<OtpCubit>(context).verifyOtp(otp);
+                              BlocProvider.of<OtpCubit>(context).verifyOtp(widget.phone,otp);
                             },
                       child: Text(
                         "VERIFY",
