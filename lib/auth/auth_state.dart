@@ -1,4 +1,4 @@
-import '../models/user_model.dart';
+import 'package:haveliapp/models/Userdetails.dart';
 
 abstract class AuthState {}
 
@@ -7,18 +7,14 @@ class Init extends AuthState {}
 class Authenticating extends AuthState {}
 
 class Authenticated extends AuthState {
-//  when 200
-    User userdata;
+  Userdetails userdetails;
 
-    Authenticated(this.userdata);
+  Authenticated(this.userdetails);
 }
 
-class UnAuthenticated extends AuthState {
-//  when  401
-}
-
+class UnAuthenticated extends AuthState {}
 class Failed extends AuthState {
-  String? message;
+  String message;
 
   Failed(this.message);
 }
