@@ -1,7 +1,5 @@
-class Userdetails {
-
-
-  Userdetails.fromJson(dynamic json) {
+class UserDetails {
+  UserDetails.fromJson(dynamic json) {
     id = json['id'];
     email = json['email'];
     username = json['username'];
@@ -14,9 +12,9 @@ class Userdetails {
   }
   late int id;
   late String email;
-  late String username;
-  late String image;
-  late String bio;
+  late String? username;
+  late String? image;
+  late String? bio;
   late int followers;
   late int following;
   late int posts;
@@ -35,5 +33,4 @@ class Userdetails {
     map['in_followlist'] = inFollowlist;
     return map;
   }
-
 }

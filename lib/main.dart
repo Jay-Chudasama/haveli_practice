@@ -1,68 +1,87 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+// ignore_for_file: prefer_const_constructors
+
 import 'package:haveliapp/auth/auth_bloc.dart';
 import 'package:haveliapp/auth/auth_event.dart';
 import 'package:haveliapp/auth/auth_state.dart';
-import 'package:haveliapp/signup/sign_up_screen.dart';
-import 'package:haveliapp/signup/signup_bloc.dart';
+import 'package:haveliapp/profile/profile_bloc.dart';
+import 'package:haveliapp/profile/profile_screen.dart';
+import 'package:haveliapp/sign_up/sign_up_bloc.dart';
+import 'package:haveliapp/sign_up/sign_up_scren.dart';
 import 'package:haveliapp/utils.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'home/home_screen.dart';
 
-void run(){
+void run() {
   if (!appInitialized) {
     appInitialized = true;
-    runApp(BlocProvider(create: (_) => authBloc, child: MyApp()));
+    runApp(BlocProvider(
+      create: (context) => authBloc,
+      child: MyApp(),
+    ));
   }
 }
 
 AuthBloc authBloc = AuthBloc(run);
-
 bool appInitialized = false;
-
 void main() async {
-
-
   WidgetsFlutterBinding.ensureInitialized();
+
   await getToken();
 
   if (TOKEN != null) {
-    authBloc.add(Authenticate());
-  }else{
+    // deletToken();
+    print(TOKEN);
+    authBloc.add(Authenticat(false));
+  } else {
     run();
   }
-
-
 }
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<AuthBloc, AuthState>(
-        listener: (context, state) {
-          //  todo
-        },
-        builder: (context, state) => MaterialApp(
+      listener: (context, state) {
+        //todo
+        if (state is UnAuthenticated) {
+          deletToken();
+        }
+        if (state is Authenticated) {}
+      },
+      builder: (context, state) {
+        return MaterialApp(
+          theme: ThemeData(fontFamily: 'Kanit-Regular'),
           debugShowCheckedModeBanner: false,
-              home: state is Failed || state is Authenticating
-                  ? Scaffold(
-                      body: Center(
-                        child: state is Failed
-                            ? ElevatedButton(
-                                child: Text("TRY AGAIN"),
-                                onPressed: () {
-                                  BlocProvider.of<AuthBloc>(context)
-                                      .add(Authenticate());
-                                },
-                              )
-                            : Center(
-                                child: CircularProgressIndicator(),
-                              ),
-                      ),
-                    )
-                  : state is Authenticated
-                      ? Text("HOME")
-                      : BlocProvider(
-                          create: (_) => SignUpBloc(), child: SignUpScreen()),
-            ));
+          home: state is Failed || state is Authenticating
+              ? Scaffold(
+                  body: Center(
+                    child: state is Failed
+                        ? ElevatedButton(
+                            onPressed: () {
+                              BlocProvider.of<AuthBloc>(context)
+                                  .add(Authenticat(false));
+                            },
+                            child: Text("TRY AGAIN"))
+                        : Center(
+                            child: CircularProgressIndicator(),
+                          ),
+                  ),
+                )
+              : state is Authenticated
+                  ? state.setupAccount
+                      ? BlocProvider(
+                          create: (context) => ProfileBloc(),
+                          child: ProfileScreen(),
+                        )
+                      : HomeScreen()
+                  : BlocProvider(
+                      create: (context) => SignUpBloc(),
+                      child: SignUpScreen(),
+                    ),
+        );
+      },
+    );
   }
 }

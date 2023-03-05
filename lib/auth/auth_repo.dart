@@ -1,10 +1,9 @@
-import 'package:dio/dio.dart';
-import 'package:haveliapp/constant.dart';
+import 'package:haveliapp/constants.dart';
 
 class AuthRepo {
-  Future<dynamic> loadUserDetailsApi() async {
+  Future<dynamic> loadUserDetailApi() async {
     var response =
-        await DIO.get("$BASE_URL/api/userdetails/", options: TOKEN_HEADER);
+        await DIO.get("$BASE_URL/api/userdetails/", options: TOKEN_HEDER);
     return response;
   }
 }

@@ -1,60 +1,66 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
+
 import 'package:haveliapp/auth/auth_bloc.dart';
 import 'package:haveliapp/auth/auth_event.dart';
-import 'package:haveliapp/login/login_bloc.dart';
-import 'package:haveliapp/login/login_event.dart';
-import 'package:haveliapp/login/login_state.dart';
+import 'package:haveliapp/forget_password/forget_password_bloc.dart';
+import 'package:haveliapp/forget_password/forget_password_screen.dart';
+import 'package:haveliapp/log_in/login_bloc.dart';
+import 'package:haveliapp/log_in/login_event.dart';
+import 'package:haveliapp/log_in/login_state.dart';
+import 'package:haveliapp/profile/profile_bloc.dart';
+import 'package:haveliapp/profile/profile_screen.dart';
+import 'package:haveliapp/utils.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-class LoginScreen extends StatefulWidget {
+class LogIn extends StatefulWidget {
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<LogIn> createState() => _LogInState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LogInState extends State<LogIn> {
   var formkey = GlobalKey<FormState>();
 
-  String email = "", password = "";
-
   String? emailError, passwordError;
+
+  String email = "", password = "";
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: BlocConsumer<LoginBLoc, LoginState>(
+      body: BlocConsumer<LoginBloc, LoginState>(
         listener: (context, state) {
-
-          if(state is LoggedIn){
-            BlocProvider.of<AuthBloc>(context).add(Authenticate());
+          if (state is LoggedIn) {
+            BlocProvider.of<AuthBloc>(context).add(Authenticat(true));
             Navigator.pop(context);
-          //  todo setup account push
           }
-
           if (state is Failed) {
-            if (state.message == "User not found") {
+            if (state.msg == "User not found") {
               setState(() {
-                emailError = state.message;
+                emailError = state.msg;
               });
-            } else if (state.message == "incorrect password") {
+            }
+            if (state.msg == "incorrect password") {
               setState(() {
-                passwordError = state.message;
+                passwordError = state.msg;
               });
             } else {
               ScaffoldMessenger.of(context)
-                  .showSnackBar(SnackBar(content: Text("${state.message}")));
+                  .showSnackBar(SnackBar(content: Text("${state.msg}")));
             }
           }
+          // TODO: implement listener
         },
         builder: (context, state) {
           return SingleChildScrollView(
-            child: Form(
-              key: formkey,
-              child: Padding(
-                padding: const EdgeInsets.all(24.0),
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Form(
+                key: formkey,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    const SizedBox(
+                    SizedBox(
                       height: 100,
                     ),
                     Image.asset(
@@ -62,7 +68,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       height: 100,
                       width: 100,
                     ),
-                    const SizedBox(
+                    SizedBox(
                       height: 40,
                     ),
                     //----------------------->Email<-----------------------------
@@ -71,34 +77,32 @@ class _LoginScreenState extends State<LoginScreen> {
                         if (value == null || value.isEmpty) {
                           return "Required";
                         }
-                        final bool emailValid = RegExp(
-                                r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-                            .hasMatch(value);
-                        if (emailValid) {
+                        if (validEmail(value)) {
                           email = value;
                         } else {
-                          return "Invalid Email";
+                          return "Please enter a valid Email Address";
                         }
                       },
+                      enabled: !(state is Submitting || state is LoggedIn),
                       decoration: InputDecoration(
                         errorText: emailError,
-                        enabled: !(state is Submitting),
                         hintText: "Email Address",
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
                         ),
-                        prefixIcon: const Icon(
+                        prefixIcon: Icon(
                           Icons.email,
                           size: 30,
                         ),
                       ),
                     ),
-                    const SizedBox(
+                    SizedBox(
                       height: 40,
                     ),
 
                     //-------------------->password<-------------------------------------
                     TextFormField(
+                      enabled: !(state is Submitting || state is LoggedIn),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return "Required";
@@ -109,21 +113,22 @@ class _LoginScreenState extends State<LoginScreen> {
                           return "Incorrect password!";
                         }
                       },
-                      obscureText: true,
                       decoration: InputDecoration(
                         errorText: passwordError,
-                        enabled: !(state is Submitting),
                         hintText: "Password",
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
                         ),
                         suffixIcon: IconButton(
                             //--------------------------hidePassword button-------------------
-                            onPressed: () {
-                              //todo
-                            },
-                            icon: const Icon(Icons.visibility_off)),
-                        prefixIcon: const Icon(
+
+                            onPressed: state is Submitting || state is LoggedIn
+                                ? null
+                                : () {
+                                    //todo
+                                  },
+                            icon: Icon(Icons.visibility_off)),
+                        prefixIcon: Icon(
                           Icons.lock,
                           size: 30,
                         ),
@@ -133,32 +138,39 @@ class _LoginScreenState extends State<LoginScreen> {
                     Align(
                       alignment: Alignment.centerLeft,
                       child: TextButton(
-                        onPressed: (state is Submitting)
+                        onPressed: state is Submitting || state is LoggedIn
                             ? null
                             : () {
                                 //todo
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => BlocProvider(
+                                              create: (context) => ForgetBloc(),
+                                              child: ForgetPasswordScreen(),
+                                            )));
                               },
-                        child: const Text(
+                        child: Text(
                           "Forget Password?",
                           style: TextStyle(color: Colors.black),
                         ),
                       ),
                     ),
-                    const SizedBox(
+                    SizedBox(
                       height: 60,
                     ),
                     //<--------------------------------indicatior<-----------------------------
                     SizedBox(
                       height: 25,
                       width: 25,
-                      child: state is Submitting
-                          ? const CircularProgressIndicator(
+                      child: state is Submitting || state is LoggedIn
+                          ? CircularProgressIndicator(
                               strokeWidth: 2,
                               // value: 0.8,
                             )
                           : null,
                     ),
-                    const SizedBox(
+                    SizedBox(
                       height: 60,
                     ),
                     //----------------------------->LogIn<---------------------------------
@@ -170,33 +182,33 @@ class _LoginScreenState extends State<LoginScreen> {
                             elevation: 0,
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12))),
-                        onPressed: (state is Submitting)
+                        onPressed: state is Submitting || state is LoggedIn
                             ? null
                             : () {
                                 if (formkey.currentState!.validate()) {
-                                  BlocProvider.of<LoginBLoc>(context)
+                                  BlocProvider.of<LoginBloc>(context)
                                       .add(Login(email, password));
                                 }
                               },
-                        child: const Text(
+                        child: Text(
                           "Login",
                           style: TextStyle(
                               fontWeight: FontWeight.bold, fontSize: 16),
                         ),
                       ),
                     ),
-                    const SizedBox(
+                    SizedBox(
                       height: 40,
                     ),
-                    //-------------------------->Login-------------------------------------------------
+                    //-------------------------->SignUp-------------------------------------------------
                     TextButton(
-                      onPressed: (state is Submitting)
+                      onPressed: state is Submitting || state is LoggedIn
                           ? null
                           : () {
                               Navigator.pop(context);
                             },
                       child: RichText(
-                        text: const TextSpan(
+                        text: TextSpan(
                           text: "Don't have an Account?",
                           style: TextStyle(
                               color: Colors.black, fontFamily: 'Kanit-Regular'),

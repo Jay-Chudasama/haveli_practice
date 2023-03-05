@@ -1,3 +1,6 @@
-abstract class AuthEvent{}
+abstract class AuthEvent {}
 
-class Authenticate extends AuthEvent{}
+class Authenticat extends AuthEvent {
+  bool setupAccount;
+  Authenticat(this.setupAccount);
+}
