@@ -33,6 +33,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     model =
         (BlocProvider.of<AuthBloc>(context).state as AuthState.Authenticated)
             .userDetails;
+    username=model.username==null?"":model.username!;
     return Scaffold(
       body: BlocConsumer<ProfileBloc, ProfileState>(
         listener: (context, state) {
