@@ -25,7 +25,7 @@ print((state as StoriesLoaded).stories.length);
           physics: BouncingScrollPhysics(),
           scrollDirection: Axis.horizontal,
           itemBuilder: (context, index) {
-            return StoryItem((state as StoriesLoaded).stories[index]);
+            return StoryItem((state as StoriesLoaded).stories,index);
           },
           itemCount: (state as StoriesLoaded).stories.length,
         ),

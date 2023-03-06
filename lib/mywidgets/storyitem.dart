@@ -4,9 +4,10 @@ import 'package:haveliapp/home/story_screen.dart';
 import 'package:haveliapp/model/StoryModel.dart';
 
 class StoryItem extends StatelessWidget {
-  StoryModel model;
+  List<StoryModel> list;
+  int index;
 
-  StoryItem(this.model);
+  StoryItem(this.list,this.index);
 
   @override
   Widget build(BuildContext context) {
@@ -18,10 +19,11 @@ class StoryItem extends StatelessWidget {
         children: [
           GestureDetector(
             onTap: () {
+              StoryScreen.initailPage = index;
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => StoryScreen(model),
+                    builder: (context) => StoryScreen(list),
                   ));
             },
             child: Container(
@@ -32,7 +34,7 @@ class StoryItem extends StatelessWidget {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(100),
                 child: Image.network(
-                  BASE_URL + model.story[0].image,
+                  BASE_URL + list[index].story[0].image,
                   height: 70,
                   width: 70,
                   fit: BoxFit.cover,
@@ -43,7 +45,7 @@ class StoryItem extends StatelessWidget {
           SizedBox(
             height: 4,
           ),
-          Text(model.username, textAlign: TextAlign.center, maxLines: 2)
+          Text(list[index].username, textAlign: TextAlign.center, maxLines: 2)
         ],
       ),
     );

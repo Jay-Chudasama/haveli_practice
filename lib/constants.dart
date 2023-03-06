@@ -1,7 +1,7 @@
 import 'package:haveliapp/utils.dart';
 import 'package:dio/dio.dart';
 
-const BASE_URL = "http://192.168.1.2:8000";
+const BASE_URL = "http://192.168.1.4:8000";
 
 final Dio DIO = Dio();
 
