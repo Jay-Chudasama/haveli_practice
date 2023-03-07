@@ -5,13 +5,14 @@ import 'dart:io';
 import 'package:haveliapp/auth/auth_bloc.dart';
 import 'package:haveliapp/auth/auth_state.dart' as AuthState;
 import 'package:haveliapp/constants.dart';
-import 'package:haveliapp/model/user_details.dart';
 import 'package:haveliapp/profile/profile_bloc.dart';
 import 'package:haveliapp/profile/profile_event.dart';
 import 'package:haveliapp/profile/profile_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
+
+import '../model/User_details.dart';
 
 class ProfileScreen extends StatefulWidget {
   @override

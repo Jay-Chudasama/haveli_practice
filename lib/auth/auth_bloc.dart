@@ -1,9 +1,10 @@
 import 'package:haveliapp/auth/auth_event.dart';
 import 'package:haveliapp/auth/auth_repo.dart';
 import 'package:haveliapp/auth/auth_state.dart';
-import 'package:haveliapp/model/user_details.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../model/User_details.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   Function run;

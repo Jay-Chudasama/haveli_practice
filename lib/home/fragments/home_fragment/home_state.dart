@@ -12,10 +12,16 @@ class StoriesLoaded extends HomeState {
   StoriesLoaded(this.stories);
 }
 
-class Failed extends HomeState {
+class UploadingStory extends StoriesLoaded {
+  UploadingStory(super.stories);
+}
 
+class DeletingStory extends StoriesLoaded {
+  DeletingStory(super.stories);
+}
+
+class Failed extends HomeState {
   String message;
 
   Failed(this.message);
 }
-

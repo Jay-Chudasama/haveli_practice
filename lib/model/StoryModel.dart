@@ -1,6 +1,9 @@
 import 'Story.dart';
 
 class StoryModel {
+
+
+
   StoryModel(
       {required this.id,
       required this.username,

@@ -1,13 +1,14 @@
 import 'package:haveliapp/auth/auth_bloc.dart';
 import 'package:haveliapp/auth/auth_state.dart' as AuthState;
 import 'package:haveliapp/main.dart';
-import 'package:haveliapp/model/user_details.dart';
 import 'package:haveliapp/profile/profile_event.dart';
 import 'package:haveliapp/profile/profile_repo.dart';
 import 'package:haveliapp/profile/profile_state.dart';
 import 'package:haveliapp/utils.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../model/User_details.dart';
 
 class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   ProfileBloc() : super(Init()) {

@@ -11,7 +11,8 @@ import 'package:haveliapp/home/fragments/home_fragment/home_fragment.dart';
 import 'package:haveliapp/home/fragments/notification_fragment/notification_fragment.dart';
 import 'package:haveliapp/home/fragments/profile_fragment/profile_fragment.dart';
 import 'package:haveliapp/home/fragments/search_fragment/search_fragment.dart';
-import 'package:haveliapp/model/user_details.dart';
+
+import '../model/User_details.dart';
 
 
 class HomeScreen extends StatefulWidget {
