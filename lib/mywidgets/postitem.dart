@@ -1,33 +1,70 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:haveliapp/constants.dart';
+import 'package:haveliapp/model/PostModel.dart';
+import 'package:jiffy/jiffy.dart';
 import 'package:like_button/like_button.dart';
 
 class PostItem extends StatefulWidget {
+  PostModel model;
+  late LikeButton likeBtn;
+
+  PostItem(this.model) {
+    likeBtn = LikeButton(
+      size: 30,
+      circleColor:
+          CircleColor(start: Color(0xff00ddff), end: Color(0xff0099cc)),
+      bubblesColor: BubblesColor(
+        dotPrimaryColor: Color(0xffd7227e),
+        dotSecondaryColor: Color(0xffcc0000),
+      ),
+      likeBuilder: (bool isLiked) {
+        return Icon(
+          !isLiked ? CupertinoIcons.heart : CupertinoIcons.heart_fill,
+          color: isLiked ? Colors.redAccent : Colors.black,
+          size: 30,
+        );
+      },
+      countBuilder: (likeCount, isLiked, text) {
+        return Text("$text likes");
+      },
+  onTap: (isLiked) async {
+    like();
+    return !isLiked;
+  },
+      isLiked: model.liked,
+      likeCount: model.likes,
+    );
+  }
+
+  void like() async {
+
+      if(model.liked){
+        //  dislike
+        model.likes--;
+        model.liked = false;
+
+      }else{
+        //  like
+        model.liked = true;
+        model.likes++;
+
+      }
+    try {
+       await DIO.post("$BASE_URL/api/like/",
+          data: {"id": model.id}, options: TOKEN_HEDER);
+
+    } catch (value) {
+      print(value);
+    }
+  }
+
   @override
   State<PostItem> createState() => _PostItemState();
 }
 
 class _PostItemState extends State<PostItem> {
-  LikeButton likeBtn = LikeButton(
-    size: 30,
-    circleColor: CircleColor(start: Color(0xff00ddff), end: Color(0xff0099cc)),
-    bubblesColor: BubblesColor(
-      dotPrimaryColor: Color(0xffd7227e),
-      dotSecondaryColor: Color(0xffcc0000),
-    ),
-    likeBuilder: (bool isLiked) {
-      return Icon(
-        !isLiked ? CupertinoIcons.heart : CupertinoIcons.heart_fill,
-        color: isLiked ? Colors.redAccent : Colors.black,
-        size: 30,
-      );
-    },
-    countBuilder: (likeCount, isLiked, text) {
-      return Text("$text likes");
-    },
-    likeCount: 0,
-  );
-
   double hoverScale = 0;
 
   @override
@@ -50,12 +87,14 @@ class _PostItemState extends State<PostItem> {
                 CircleAvatar(
                   backgroundColor: Colors.black,
                   radius: 19,
-                  child: CircleAvatar(
-                    radius: 18,
-                    backgroundImage: NetworkImage(
-                      "https://images.unsplash.com/photo-1575936123452-b67c3203c357?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8aW1hZ2V8ZW58MHx8MHx8&w=1000&q=80",
-                    ),
-                  ),
+                  child: widget.model.user!.image == null
+                      ? Icon(Icons.account_circle)
+                      : CircleAvatar(
+                          radius: 18,
+                          backgroundImage: NetworkImage(
+                            BASE_URL + widget.model.user!.image,
+                          ),
+                        ),
                 ),
                 SizedBox(
                   width: 8,
@@ -64,11 +103,11 @@ class _PostItemState extends State<PostItem> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Dani",
+                      widget.model.user!.username,
                       style: TextStyle(fontWeight: FontWeight.w500),
                     ),
                     Text(
-                      "1 min ago",
+                      Jiffy(widget.model.createdAt).fromNow(),
                       style: TextStyle(fontSize: 12, color: Colors.grey),
                     ),
                   ],
@@ -78,11 +117,13 @@ class _PostItemState extends State<PostItem> {
           ),
           GestureDetector(
             onDoubleTap: () {
-
-              likeBtn.onMyTap();
+              if(widget.model.liked){
+                return;
+              }
+              widget.likeBtn.onMyTap();
               setState(() {
                 hoverScale = 1;
-                Future.delayed(Duration(seconds: 1),(){
+                Future.delayed(Duration(seconds: 1), () {
                   setState(() {
                     hoverScale = 0;
                   });
@@ -92,12 +133,19 @@ class _PostItemState extends State<PostItem> {
             child: Stack(
               alignment: Alignment.center,
               children: [
-                Image.network(
-                  "https://images.unsplash.com/photo-1575936123452-b67c3203c357?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8aW1hZ2V8ZW58MHx8MHx8&w=1000&q=80",
+                CachedNetworkImage(
+                  progressIndicatorBuilder: (context, url, progress) => Center(
+                    child: CircularProgressIndicator(
+                      value: progress.progress,
+                    ),
+                  ),
                   fit: BoxFit.cover,
                   width: screenWidth,
                   height: screenWidth * 9 / 16,
+                  imageUrl:
+                  BASE_URL + widget.model.image,
                 ),
+
                 AnimatedScale(
                   curve: Curves.ease,
                   duration: const Duration(milliseconds: 400),
@@ -117,17 +165,19 @@ class _PostItemState extends State<PostItem> {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Text(
-              "Helloworld how ar you f.sdfa.f df.as fasfd sa fdsad.f asf a",
+              widget.model.caption,
             ),
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Row(
-              children: [likeBtn],
+              children: [widget.likeBtn],
             ),
           )
         ],
       ),
     );
   }
+
+
 }

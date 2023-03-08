@@ -11,8 +11,9 @@ import '../auth/auth_state.dart';
 class StoryItem extends StatefulWidget {
   List<StoryModel> list;
   int index;
+  Function deleteStory;
 
-  StoryItem(this.list,this.index);
+  StoryItem(this.list,this.index,{required this.deleteStory});
 
   @override
   State<StoryItem> createState() => _StoryItemState();
@@ -37,7 +38,7 @@ class _StoryItemState extends State<StoryItem> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => StoryScreen(widget.list),
+                    builder: (context) => StoryScreen(widget.list,deleteStory: widget.deleteStory,),
                   ));
             },
             child: Container(

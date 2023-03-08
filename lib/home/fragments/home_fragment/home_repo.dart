@@ -24,8 +24,32 @@ class HomeRepo {
   }
 
   Future<dynamic> deletstory(int id) async {
-    var response = await DIO.get("$BASE_URL/api/deletstory/",
+    var response = await DIO.get("$BASE_URL/api/deletestory/",
         queryParameters: {"id": id}, options: TOKEN_HEDER);
+    return response;
+  }
+
+  Future<dynamic> loadFeeds() async {
+    var response = await DIO.get("$BASE_URL/api/homefeeds/",
+        queryParameters: {"limit": 1}, options: TOKEN_HEDER);
+    return response;
+  }
+
+  Future<dynamic> loadeMore(String nextUrl) async {
+    var response = await DIO.get(nextUrl, options: TOKEN_HEDER);
+    return response;
+  }
+  Future<dynamic> addPost(String caption, File? image) async {
+    FormData formdata = FormData.fromMap({"caption": caption});
+    if (image != null) {
+      String fileName = image.path.split('./').last;
+      formdata = FormData.fromMap({
+        "caption": caption,
+        "image": await MultipartFile.fromFile(image.path, filename: fileName)
+      });
+    }
+    var response = await DIO.post("$BASE_URL/api/addpost/",
+        options: TOKEN_HEDER, data: formdata);
     return response;
   }
 }

@@ -21,3 +21,18 @@ class DeletStory extends HomeEvent {
 
   DeletStory(this.id);
 }
+
+class LoadFeeds extends HomeEvent {}
+
+class LoadMoreFeeds extends HomeEvent {
+  String nextUrl;
+
+  LoadMoreFeeds(this.nextUrl);
+}
+
+class AddPost extends HomeEvent {
+  String caption;
+  File file;
+
+  AddPost(this.file, this.caption);
+}

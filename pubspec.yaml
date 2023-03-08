@@ -44,6 +44,8 @@ dependencies:
   open_mail_app: ^0.4.5
   like_button: ^2.0.5
   story_view: ^0.14.0
+  jiffy: ^5.0.1
+  cached_network_image: ^3.2.3
 
 dev_dependencies:
   flutter_test:

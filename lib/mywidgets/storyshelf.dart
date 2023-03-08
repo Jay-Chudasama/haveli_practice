@@ -15,9 +15,9 @@ import 'storyitem.dart';
 
 class StoryShelf extends StatelessWidget {
   HomeState state;
-  Function uploadStory;
+  Function uploadStory,deleteStory;
 
-  StoryShelf(this.state,this.uploadStory);
+  StoryShelf(this.state, {required this.uploadStory,required this.deleteStory});
 
   final ImagePicker _picker = ImagePicker();
 
@@ -50,8 +50,7 @@ class StoryShelf extends StatelessWidget {
 
               return Row(
                 children: [
-                  if (index == 0 &&
-                      (state as StoriesLoaded).stories[0].id != userDetails.id)
+                  if (index == 0 && ((state as StoriesLoaded).stories.length!=0?(state as StoriesLoaded).stories[0].id != userDetails.id:true))
                   Container(
                     width: 80,
                     margin: EdgeInsets.only(left: 8, top: 8),
@@ -102,19 +101,19 @@ class StoryShelf extends StatelessWidget {
                       ],
                     ),
                   ),
-                  if (index == 0 && (state as StoriesLoaded).stories[0].id == userDetails.id)
+                  if (index == 0 && ((state as StoriesLoaded).stories.length!=0?(state as StoriesLoaded).stories[0].id == userDetails.id:false))
                     GestureDetector(
                       onLongPress: (){
                         pickImage();
                       },
-                      child: StoryItem((state as StoriesLoaded).stories, index),
+                      child: StoryItem((state as StoriesLoaded).stories, index,deleteStory: deleteStory,),
                     ),
-                  if(index!=0)
-                  StoryItem((state as StoriesLoaded).stories, index),
+                  if(index!=0 || ((state as StoriesLoaded).stories.length!=0 && (state as StoriesLoaded).stories[0].id != userDetails.id))
+                  StoryItem((state as StoriesLoaded).stories, index,deleteStory: deleteStory,),
                 ],
               );
           },
-          itemCount: (state as StoriesLoaded).stories.length,
+          itemCount: (state as StoriesLoaded).stories.length == 0?1:(state as StoriesLoaded).stories.length,
         ),
       );
     }
@@ -125,6 +124,9 @@ class StoryShelf extends StatelessWidget {
 
   void pickImage() async {
     images = await _picker.pickMultiImage();
+    if(images!.length==0){
+      return;
+    }
     images!.forEach((element) {
       files.add(File(element.path));
     });

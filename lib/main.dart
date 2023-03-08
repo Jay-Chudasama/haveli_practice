@@ -11,6 +11,8 @@ import 'package:haveliapp/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'home/fragments/home_fragment/home_bloc.dart';
+import 'home/fragments/profile_fragment/profile_bloc.dart';
 import 'home/home_screen.dart';
 
 void run() {
@@ -24,7 +26,10 @@ void run() {
 }
 
 AuthBloc authBloc = AuthBloc(run);
+HomeBloc homebloc = HomeBloc();
+MyProfileBloc profileBloc = MyProfileBloc();
 bool appInitialized = false;
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -75,7 +80,14 @@ class MyApp extends StatelessWidget {
                           create: (context) => ProfileBloc(),
                           child: ProfileScreen(),
                         )
-                      : HomeScreen()
+                      : MultiBlocProvider(providers: [
+                          BlocProvider<HomeBloc>(
+                            create: (BuildContext context) => homebloc,
+                          ),
+                          BlocProvider<MyProfileBloc>(
+                            create: (BuildContext context) => profileBloc,
+                          ),
+                        ], child: HomeScreen())
                   : BlocProvider(
                       create: (context) => SignUpBloc(),
                       child: SignUpScreen(),

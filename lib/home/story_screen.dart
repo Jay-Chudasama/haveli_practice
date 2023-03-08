@@ -10,15 +10,25 @@ import '../auth/auth_bloc.dart';
 import '../auth/auth_state.dart';
 import '../model/User_details.dart';
 
-class StoryScreen extends StatelessWidget {
+class StoryScreen extends StatefulWidget {
   List<StoryModel> storyList;
   static int initailPage = 0;
+  Function deleteStory;
 
-  StoryScreen(this.storyList);
+
+  StoryScreen(this.storyList, {required this.deleteStory});
+
+  @override
+  State<StoryScreen> createState() => _StoryScreenState();
+}
+
+class _StoryScreenState extends State<StoryScreen> {
+  int? deleteId;
 
   final controller = StoryController();
+
   final PageController pageController =
-      PageController(initialPage: initailPage);
+      PageController(initialPage: StoryScreen.initailPage);
 
   @override
   Widget build(context) {
@@ -31,14 +41,16 @@ class StoryScreen extends StatelessWidget {
   }
 
   List<Widget> buildStories(context) {
+
     List<Widget> stories = [];
     late int id;
 
-    storyList.forEach((StoryModel model) {
+
+    widget.storyList.forEach((StoryModel model) {
       id = model.id;
       List<StoryItem> storyItems = model.story
           .map<StoryItem>((e) => StoryItem.pageImage(
-              url: BASE_URL + e.image, controller: controller))
+              id: e.id, url: BASE_URL + e.image, controller: controller))
           .toList(); // your list of stories
 
       UserDetails userDetails =
@@ -54,9 +66,11 @@ class StoryScreen extends StatelessWidget {
               // pass controller here too
               repeat: false,
               // should the stories be slid forever
-              onStoryShow: (s) {},
+              onStoryShow: (s) {
+                deleteId = s.id;
+              },
               onComplete: () {
-                if (pageController.page == storyList.length - 1) {
+                if (pageController.page == widget.storyList.length - 1) {
                   Navigator.pop(context);
                 } else {
                   pageController.nextPage(
@@ -99,7 +113,21 @@ class StoryScreen extends StatelessWidget {
                   bottom: 0,
                   right: 0,
                   child: IconButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      controller.pause();
+                      showDialog(
+                          context: context,
+                          builder: (_) => AlertDialog(
+                                title: Text("Deleting Story..."),
+                              ),
+                          barrierDismissible: false);
+                      widget.deleteStory(deleteId, () {
+                        Navigator.pop(context);
+                               setState(() {
+                                 controller.play();
+                               });
+                      });
+                    },
                     icon: Icon(
                       Icons.delete,
                       color: Colors.pink,
