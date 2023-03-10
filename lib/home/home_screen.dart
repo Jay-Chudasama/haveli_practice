@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:haveliapp/auth/auth_bloc.dart';
+import 'package:haveliapp/auth/auth_event.dart';
 import 'package:haveliapp/auth/auth_state.dart';
 import 'package:haveliapp/constants.dart';
 import 'package:haveliapp/home/addpost.dart';
@@ -26,11 +27,11 @@ class HomeScreen extends StatefulWidget {
 HomeFragment homeview = HomeFragment();
 ProfileFragment profileview = ProfileFragment(null);
 
+var searchFragment = SearchFragment();
+var notificationFragment = NotificationFragment();
+
 class _HomeScreenState extends State<HomeScreen> {
   int selectedFragment = 0;
-
-  var searchFragment = SearchFragment();
-  var notificationFragment = NotificationFragment();
 
   @override
   Widget build(BuildContext context) {
@@ -38,22 +39,51 @@ class _HomeScreenState extends State<HomeScreen> {
         (BlocProvider.of<AuthBloc>(context).state as Authenticated).userDetails;
 
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        leading: Padding(
-          padding: const EdgeInsets.only(left: 16),
-          child: Image.asset(
-            "assets/images/logo.png",
-            height: 40,
-            width: 40,
-          ),
-        ),
-        leadingWidth: 56,
-        title: Image.asset(
-          "assets/images/logo_text.png",
-          height: 40,
-        ),
-      ),
+      appBar: selectedFragment != 0
+          ? null
+          : AppBar(
+              backgroundColor: Colors.white,
+              leading: Padding(
+                padding: const EdgeInsets.only(left: 16),
+                child: Image.asset(
+                  "assets/images/logo.png",
+                  height: 40,
+                  width: 40,
+                ),
+              ),
+              actions: [
+                IconButton(
+                    onPressed: () {
+                      showDialog(
+                          context: context,
+                          builder: (_) => AlertDialog(
+                                title: Text("Are you sure you want to logout?"),
+                                actions: [
+                                  ElevatedButton(
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                      child: Text("Cancel")),
+                                  ElevatedButton(
+                                      onPressed: () {
+                                       authBloc.add(Logout());
+                                       Navigator.pop(context);
+                                      },
+                                      child: Text("YES"))
+                                ],
+                              ));
+                    },
+                    icon: Icon(
+                      Icons.power_settings_new,
+                      color: Colors.red,
+                    ))
+              ],
+              leadingWidth: 56,
+              title: Image.asset(
+                "assets/images/logo_text.png",
+                height: 40,
+              ),
+            ),
       body: setFragment(selectedFragment),
       bottomNavigationBar: BottomNavigationBar(
         showSelectedLabels: false,

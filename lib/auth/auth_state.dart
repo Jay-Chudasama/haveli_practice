@@ -15,6 +15,7 @@ class Authenticated extends AuthState {
 }
 
 class UnAuthenticated extends AuthState {}
+class LoggedOut extends AuthState {}
 
 class Failed extends AuthState {
   String message;

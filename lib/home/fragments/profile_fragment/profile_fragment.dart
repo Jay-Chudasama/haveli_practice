@@ -1,4 +1,3 @@
-import 'dart:ffi';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -11,12 +10,19 @@ import 'package:haveliapp/mywidgets/postitem.dart';
 
 import '../../../auth/auth_bloc.dart';
 import '../../../auth/auth_state.dart' as AuthState;
+import '../../../main.dart';
 
-class ProfileFragment extends StatelessWidget {
+class ProfileFragment extends StatefulWidget {
   int? id;
+  Function? follow;
 
-  ProfileFragment(this.id);
+  ProfileFragment(this.id, {this.follow});
 
+  @override
+  State<ProfileFragment> createState() => _ProfileFragmentState();
+}
+
+class _ProfileFragmentState extends State<ProfileFragment> {
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<MyProfileBloc, MyProfileState>(
@@ -32,7 +38,7 @@ class ProfileFragment extends StatelessWidget {
       }
     }, builder: (context, state) {
       if (state is Init) {
-        BlocProvider.of<MyProfileBloc>(context).add(LoadDetails(id));
+        BlocProvider.of<MyProfileBloc>(context).add(LoadDetails(widget.id));
       }
       if (state is Loaded) {
         return Column(
@@ -99,12 +105,28 @@ class ProfileFragment extends StatelessWidget {
                     children: [
                       Text(state.model.bio),
                       Spacer(),
-                      if (id != null)
+                      if (widget.id != null)
                         ElevatedButton(
+                           style: ElevatedButton.styleFrom(
+                                backgroundColor: state.model.inFollowlist ? Colors.grey : null,
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12))),
                             onPressed: () {
-                              //todo
+                             if(widget.follow!=null) {
+                               widget.follow!();
+                             }
+                              setState(() {
+                                if(state.model.inFollowlist){
+                                state.model.inFollowlist = false;
+                                  state.model.followers--;
+                                }else{
+                                state.model.inFollowlist = true;
+
+                                  state.model.followers++;
+                                }
+                              });
                             },
-                            child: Text("Follow")),
+                            child: Text(state.model.inFollowlist?"Following":"Follow")),
                       Spacer(),
                       Text(
                         "Post  ${state.model.posts}",
@@ -147,4 +169,5 @@ class ProfileFragment extends StatelessWidget {
       );
     });
   }
+
 }

@@ -3,6 +3,8 @@
 import 'package:haveliapp/auth/auth_bloc.dart';
 import 'package:haveliapp/auth/auth_event.dart';
 import 'package:haveliapp/auth/auth_state.dart';
+import 'package:haveliapp/home/fragments/notification_fragment/notification_bloc.dart';
+import 'package:haveliapp/home/fragments/search_fragment/search_bloc.dart';
 import 'package:haveliapp/profile/profile_bloc.dart';
 import 'package:haveliapp/profile/profile_screen.dart';
 import 'package:haveliapp/sign_up/sign_up_bloc.dart';
@@ -27,6 +29,8 @@ void run() {
 
 AuthBloc authBloc = AuthBloc(run);
 HomeBloc homebloc = HomeBloc();
+SearchBloc searchBloc = SearchBloc();
+NotificationBloc notificationBloc = NotificationBloc();
 MyProfileBloc profileBloc = MyProfileBloc();
 bool appInitialized = false;
 
@@ -50,7 +54,7 @@ class MyApp extends StatelessWidget {
     return BlocConsumer<AuthBloc, AuthState>(
       listener: (context, state) {
         //todo
-        if (state is UnAuthenticated) {
+        if (state is UnAuthenticated || state is LoggedOut) {
           deletToken();
         }
         if (state is Authenticated) {}
@@ -87,6 +91,12 @@ class MyApp extends StatelessWidget {
                           BlocProvider<MyProfileBloc>(
                             create: (BuildContext context) => profileBloc,
                           ),
+                          BlocProvider<SearchBloc>(
+                            create: (BuildContext context) => searchBloc,
+                          ),
+            BlocProvider<NotificationBloc>(
+              create: (BuildContext context) => notificationBloc,
+            ),
                         ], child: HomeScreen())
                   : BlocProvider(
                       create: (context) => SignUpBloc(),

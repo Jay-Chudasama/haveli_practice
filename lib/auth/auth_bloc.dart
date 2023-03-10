@@ -36,6 +36,16 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         }
       }
     });
+    on<Logout>((event, emit) async {
+      emit(LoggedOut());
+
+      try {
+        var response = await repo.logout();
+
+      } catch (value) {
+
+      }
+    });
   }
   @override
   void onChange(Change<AuthState> change) {
