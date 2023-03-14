@@ -1,156 +1,143 @@
-// ignore_for_file: prefer_const_constructors
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:haveliapp/auth/auth_bloc.dart';
-import 'package:haveliapp/auth/auth_event.dart';
-import 'package:haveliapp/auth/auth_state.dart';
-import 'package:haveliapp/constants.dart';
-import 'package:haveliapp/home/addpost.dart';
-import 'package:haveliapp/home/fragments/home_fragment/home_bloc.dart';
-import 'package:haveliapp/home/fragments/home_fragment/home_event.dart';
-import 'package:haveliapp/home/fragments/home_fragment/home_fragment.dart';
-import 'package:haveliapp/home/fragments/notification_fragment/notification_fragment.dart';
-import 'package:haveliapp/home/fragments/profile_fragment/profile_bloc.dart';
-import 'package:haveliapp/home/fragments/profile_fragment/profile_fragment.dart';
-import 'package:haveliapp/home/fragments/search_fragment/search_fragment.dart';
+import 'package:haveliapp/home/fragments/cart_fragments/cart_fragment.dart';
+import 'package:haveliapp/home/fragments/home_fragments/home_fragment.dart';
+import 'package:haveliapp/home/fragments/orders_fragments/orders_fragment.dart';
+import 'package:haveliapp/home/fragments/profile_fragments/profile_fragmnet.dart';
 
-import '../main.dart';
-import '../model/User_details.dart';
+class DrawerItem {
+  String title;
+  IconData icon;
+
+  DrawerItem(this.title, this.icon);
+}
 
 class HomeScreen extends StatefulWidget {
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-HomeFragment homeview = HomeFragment();
-ProfileFragment profileview = ProfileFragment(null);
-
-var searchFragment = SearchFragment();
-var notificationFragment = NotificationFragment();
-
 class _HomeScreenState extends State<HomeScreen> {
   int selectedFragment = 0;
 
-  @override
-  Widget build(BuildContext context) {
-    UserDetails userdata =
-        (BlocProvider.of<AuthBloc>(context).state as Authenticated).userDetails;
+  var homeFragment = HomeFragment();
+  var orderFragment = OrderFragment();
+  var carFragment = CartFragmemnt();
+  var profileFragment = ProfileFragment();
 
-    return Scaffold(
-      appBar: selectedFragment != 0
-          ? null
-          : AppBar(
-              backgroundColor: Colors.white,
-              leading: Padding(
-                padding: const EdgeInsets.only(left: 16),
-                child: Image.asset(
-                  "assets/images/logo.png",
-                  height: 40,
-                  width: 40,
-                ),
-              ),
-              actions: [
-                IconButton(
-                    onPressed: () {
-                      showDialog(
-                          context: context,
-                          builder: (_) => AlertDialog(
-                                title: Text("Are you sure you want to logout?"),
-                                actions: [
-                                  ElevatedButton(
-                                      onPressed: () {
-                                        Navigator.pop(context);
-                                      },
-                                      child: Text("Cancel")),
-                                  ElevatedButton(
-                                      onPressed: () {
-                                       authBloc.add(Logout());
-                                       Navigator.pop(context);
-                                      },
-                                      child: Text("YES"))
-                                ],
-                              ));
-                    },
-                    icon: Icon(
-                      Icons.power_settings_new,
-                      color: Colors.red,
-                    ))
-              ],
-              leadingWidth: 56,
-              title: Image.asset(
-                "assets/images/logo_text.png",
-                height: 40,
-              ),
-            ),
-      body: setFragment(selectedFragment),
-      bottomNavigationBar: BottomNavigationBar(
-        showSelectedLabels: false,
-        showUnselectedLabels: false,
-        selectedItemColor: Colors.black,
-        iconSize: 26,
-        unselectedItemColor: Colors.grey,
-        currentIndex: selectedFragment,
-        onTap: (int index) async {
-          if (index == 2) {
-            AddPost? addPost = await Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => AddPostScreen(),
-                ));
-            if (addPost != null) {
-              homebloc.add(addPost!);
-            }
+  final drawerItems = [
+    new DrawerItem("Home", Icons.home),
+    new DrawerItem("Orders", Icons.shopping_bag_outlined),
+    new DrawerItem("Cart", Icons.shopping_cart_rounded),
+    new DrawerItem("Profile", Icons.person),
+    new DrawerItem("LogOut", Icons.logout_rounded),
+  ];
 
-            return;
-          }
-          setState(() {
-            selectedFragment = index;
-          });
-        },
-        type: BottomNavigationBarType.fixed,
-        items: [
-          BottomNavigationBarItem(
-              icon: Icon(CupertinoIcons.home), label: "Home"),
-          BottomNavigationBarItem(
-              icon: Icon(CupertinoIcons.search), label: "Search"),
-          BottomNavigationBarItem(
-              icon: Icon(
-                CupertinoIcons.add,
-                color: Colors.black,
-              ),
-              label: "add"),
-          BottomNavigationBarItem(
-              icon: Icon(CupertinoIcons.heart), label: "notification"),
-          BottomNavigationBarItem(
-              icon: userdata.image == null
-                  ? Icon(CupertinoIcons.person_alt_circle)
-                  : ClipRRect(
-                      borderRadius: BorderRadius.circular(100),
-                      child: Image.network(
-                        BASE_URL + userdata.image!,
-                        height: 30,
-                        width: 30,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-              label: "profile"),
-        ],
-      ),
-    );
+  onSelectItem(int index) {
+    setState(() {
+      selectedFragment = index;
+    });
+    Navigator.of(context).pop(); // close the drawer
   }
 
-  setFragment(selected) {
+  @override
+  Widget build(BuildContext context) {
+    var drawerOptions = <Widget>[];
+    for (int i = 0; i < drawerItems.length; i++) {
+      var d = drawerItems[i];
+      drawerOptions.add(
+        ListTile(
+          leading:  Icon(d.icon),
+          title:  Text(d.title),
+          selected: i == selectedFragment,
+          onTap: () {
+            onSelectItem(i);
+          },
+        ),
+      );
+    }
+    return Scaffold(
+        appBar: AppBar(
+          actions: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Icon(Icons.notifications_active_sharp),
+            )
+          ],
+        ),
+        body: setFragments(selectedFragment),
+
+        floatingActionButton:selectedFragment==0? Stack(
+          children: [
+            FloatingActionButton(onPressed: () {
+              //todo
+            },child: Icon(Icons.shopping_cart),),
+            Positioned(
+                top: 12.0,
+                right: 12.0,
+                child: new Center(
+                  child:Container(
+                    height: 15.0,
+                    width: 15.0,
+                    decoration: const BoxDecoration(
+                      color: Colors.blueGrey,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Center(
+                      child: Text(
+                        "10",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 8.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                )),
+          ],
+        ):null,
+        drawer: Drawer(
+          child: Column(
+            children: [
+              DrawerHeader(
+                decoration: BoxDecoration(
+                  color: Colors.green,
+                ), //BoxDecoration
+                child: UserAccountsDrawerHeader(
+                  decoration: BoxDecoration(color: Colors.green),
+                  accountName: Text(
+                    "Sahil Viradiya",
+                    style: TextStyle(fontSize: 18),
+                  ),
+                  accountEmail: Text("sahilviradiya7190@gmail.com"),
+                  currentAccountPictureSize: Size.square(50),
+                  currentAccountPicture: CircleAvatar(
+                    backgroundColor: Color.fromARGB(255, 165, 255, 137),
+                    child: Text(
+                      "S",
+                      style: TextStyle(fontSize: 30.0, color: Colors.blue),
+                    ), //Text
+                  ), //circleAvatar
+                ), //UserAccountDrawerHeader
+              ),
+              Column(
+                children: drawerOptions,
+              )
+            ],
+          ),
+        ));
+  }
+
+  setFragments(selected) {
     switch (selected) {
       case 0:
-        return homeview;
+        return homeFragment;
       case 1:
-        return searchFragment;
+        return orderFragment;
+      case 2:
+        return carFragment;
       case 3:
-        return notificationFragment;
-      case 4:
-        return profileview;
+        return profileFragment;
     }
   }
 }
