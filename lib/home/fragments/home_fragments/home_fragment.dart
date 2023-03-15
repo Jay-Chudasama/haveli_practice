@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:haveliapp/MyWidget/menu_item.dart';
 import 'package:haveliapp/auth/auth_cubit.dart';
 import 'package:haveliapp/auth/auth_state.dart' as AuthState;
 import 'package:haveliapp/constant.dart';
@@ -33,9 +34,10 @@ class HomeFragment extends StatelessWidget {
         }
 
         if (state is Loaded) {
-
-          if(state.menu==null){
-            return Center(child: Text("Order window has been closed"),);
+          if (state.menu == null) {
+            return Center(
+              child: Text("Order window has been closed"),
+            );
           }
 
           return Padding(
@@ -120,32 +122,9 @@ class HomeFragment extends StatelessWidget {
                   Wrap(
                       direction: Axis.horizontal,
                       children: state.menu!.items
-                          .map((element) => Container(
-                              height: 160,
-                              width: 120,
-                              margin: EdgeInsets.all(12),
-                              decoration: BoxDecoration(
-                                color: Colors.grey,
-                                shape: BoxShape.rectangle,
-                                borderRadius: BorderRadius.circular(14),
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.only(top: 8.0),
-                                child: Column(
-                                  children: [
-                                   CachedNetworkImage(imageUrl: BASE_URL+element.image,height: 80,width: 80,),
-                                    Text(
-                                      element.name,
-                                      style: TextStyle(fontSize: 15),
-                                    ),
-                                    OutlinedButton(
-                                        onPressed: () {
-                                          //todo
-                                        },
-                                        child: Text("Add +"))
-                                  ],
-                                ),
-                              )))
+                          .map(
+                            (element) => MenuItem(element),
+                          )
                           .toList()),
                   SizedBox(
                     height: 8,
@@ -156,36 +135,12 @@ class HomeFragment extends StatelessWidget {
                     style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
                   Wrap(
-                    direction: Axis.horizontal,
+                      direction: Axis.horizontal,
                       children: state.menu!.extras
-                          .map((element) => Container(
-                          height: 160,
-                          width: 120,
-                          margin: EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: Colors.grey,
-                            shape: BoxShape.rectangle,
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.only(top: 8.0),
-                            child: Column(
-                              children: [
-                                CachedNetworkImage(imageUrl: BASE_URL+element.image,height: 80,width: 80,),
-                                Text(
-                                  element.name,
-                                  style: TextStyle(fontSize: 15),
-                                ),
-                                OutlinedButton(
-                                    onPressed: () {
-                                      //todo
-                                    },
-                                    child: Text("Add +"))
-                              ],
-                            ),
-                          )))
-                          .toList()
-                  ),
+                          .map(
+                            (element) => MenuItem(element),
+                          )
+                          .toList()),
                 ],
               ),
             ),

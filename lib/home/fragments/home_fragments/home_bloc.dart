@@ -14,12 +14,10 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       emit(Loading());
       try {
         var response = await repo.loadMenu();
-
         emit(Loaded(response.data['type'] == null
             ? null
             : MenuModel.fromJson(response.data)));
       } catch (value) {
-        print(value);
         DioError error = value as DioError;
         if (error.response != null) {
           if (error.response!.statusCode == 403 ||
@@ -36,6 +34,10 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
           }
         }
       }
+    });
+
+    on<AddToCart>((event, emit) async {
+
     });
   }
 }

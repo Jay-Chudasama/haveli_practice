@@ -14,6 +14,7 @@ class AuthCubit extends Cubit<AuthState> {
       var response = await repo.userDetailsApi();
       emit(Authenticated(UserModel.fromJson(response.data)));
     } catch (value) {
+      print(value);
       DioError error = value as DioError;
       if (error.response != null) {
         if (error.response!.statusCode == 401 ||

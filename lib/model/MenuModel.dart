@@ -1,5 +1,4 @@
 import 'Items.dart';
-import 'Extras.dart';
 
 class MenuModel {
   MenuModel({
@@ -24,7 +23,7 @@ class MenuModel {
     if (json['extras'] != null) {
       extras = [];
       json['extras'].forEach((v) {
-        extras.add(Extras.fromJson(v));
+        extras.add(Items.fromJson(v));
       });
     }
   }
@@ -33,7 +32,7 @@ class MenuModel {
   late String? type;
   late String? closing;
   late List<Items> items;
-  late List<Extras> extras;
+  late List<Items> extras;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};

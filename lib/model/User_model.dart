@@ -8,10 +8,12 @@ class UserModel {
     id = json['id'];
     phone = json['phone'];
     name = json['name'];
+    cart = json['cart'].map<int>((dynamic id)=>id as int).toList();
   }
   late int id;
   late String phone;
   late String name;
+  late List<int> cart;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};

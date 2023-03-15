@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:haveliapp/auth/user/user_cubit.dart';
+import 'package:haveliapp/auth/user/user_state.dart';
+import 'package:haveliapp/home/fragments/cart_fragments/cart_bloc.dart';
 import 'package:haveliapp/home/fragments/cart_fragments/cart_fragment.dart';
 import 'package:haveliapp/home/fragments/home_fragments/home_fragment.dart';
 import 'package:haveliapp/home/fragments/orders_fragments/orders_fragment.dart';
@@ -21,7 +25,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   var homeFragment = HomeFragment();
   var orderFragment = OrderFragment();
-  var carFragment = CartFragmemnt();
+  var carFragment = BlocProvider(create:(_)=>CartBloc(),child: CartFragmemnt());
   var profileFragment = ProfileFragment();
 
   final drawerItems = [
@@ -85,13 +89,15 @@ class _HomeScreenState extends State<HomeScreen> {
                             color: Colors.blueGrey,
                             shape: BoxShape.circle,
                           ),
-                          child: const Center(
-                            child: Text(
-                              "10",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 8.0,
-                                fontWeight: FontWeight.bold,
+                          child: Center(
+                            child: BlocBuilder<UserCubit, UserState>(
+                              builder: (context, state) => Text(
+                                state.userdata.cart.length.toString(),
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 8.0,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
                           ),
