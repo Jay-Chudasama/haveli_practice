@@ -47,6 +47,7 @@ dependencies:
   jiffy: ^5.0.1
   cached_network_image: ^3.2.3
   lottie: ^2.2.0
+  slide_drawer: ^1.0.3
 
 dev_dependencies:
   flutter_test:

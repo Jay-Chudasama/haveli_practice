@@ -46,8 +46,8 @@ class _HomeScreenState extends State<HomeScreen> {
       var d = drawerItems[i];
       drawerOptions.add(
         ListTile(
-          leading:  Icon(d.icon),
-          title:  Text(d.title),
+          leading: Icon(d.icon),
+          title: Text(d.title),
           selected: i == selectedFragment,
           onTap: () {
             onSelectItem(i);
@@ -65,37 +65,41 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
         body: setFragments(selectedFragment),
-
-        floatingActionButton:selectedFragment==0? Stack(
-          children: [
-            FloatingActionButton(onPressed: () {
-              //todo
-            },child: Icon(Icons.shopping_cart),),
-            Positioned(
-                top: 12.0,
-                right: 12.0,
-                child: new Center(
-                  child:Container(
-                    height: 15.0,
-                    width: 15.0,
-                    decoration: const BoxDecoration(
-                      color: Colors.blueGrey,
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Center(
-                      child: Text(
-                        "10",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 8.0,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
+        floatingActionButton: selectedFragment == 0
+            ? Stack(
+                children: [
+                  FloatingActionButton(
+                    onPressed: () {
+                      //todo
+                    },
+                    child: Icon(Icons.shopping_cart),
                   ),
-                )),
-          ],
-        ):null,
+                  Positioned(
+                      top: 12.0,
+                      right: 12.0,
+                      child: new Center(
+                        child: Container(
+                          height: 15.0,
+                          width: 15.0,
+                          decoration: const BoxDecoration(
+                            color: Colors.blueGrey,
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Center(
+                            child: Text(
+                              "10",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 8.0,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                      )),
+                ],
+              )
+            : null,
         drawer: Drawer(
           child: Column(
             children: [

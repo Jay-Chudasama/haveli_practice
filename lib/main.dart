@@ -1,12 +1,30 @@
 import 'package:flutter/material.dart';
-import 'package:haveliapp/Otp/otp_screen.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:haveliapp/auth/auth_cubit.dart';
+import 'package:haveliapp/auth/auth_state.dart';
+import 'package:haveliapp/home/fragments/home_fragments/home_bloc.dart';
+import 'package:haveliapp/home/fragments/profile_fragments/profile_fragmnet.dart';
 import 'package:haveliapp/home/home_screen.dart';
+import 'package:haveliapp/phone/phone_cubit.dart';
 import 'package:haveliapp/phone/phone_screen.dart';
+import 'package:haveliapp/utils.dart';
 
 import 'Location/location_screen.dart';
 
-void main(){
-  runApp(MyApp());
+HomeBloc homeBloc = HomeBloc();
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  try {
+    await getToken();
+  } catch (e) {
+    print(e);
+  }
+
+  if (TOKEN != null) {
+    await authCubit.loaduserDetails();
+  }
+  runApp(BlocProvider(create: (context) => authCubit, child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -15,8 +33,34 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: HomeScreen(),
-    );
+        debugShowCheckedModeBanner: false,
+        home: BlocConsumer<AuthCubit, AuthState>(
+          listener: (context, state) {
+            //todo
+          },
+          builder: (context, state) {
+            if (state is Authenticated) {
+              return MultiBlocProvider(
+                  providers: [BlocProvider(create: (_) => homeBloc)],
+                  child: HomeScreen());
+            }
+            if (state is Failed) {
+              return Scaffold(
+                body: Center(
+                  child: ElevatedButton(
+                    child: Text("Retry"),
+                    onPressed: () {
+                      BlocProvider.of<AuthCubit>(context).loaduserDetails();
+                    },
+                  ),
+                ),
+              );
+            }
+            return BlocProvider(
+              create: (context) => PhoneCubit(),
+              child: PhoneScreen(),
+            );
+          },
+        ));
   }
 }
