@@ -22,53 +22,51 @@ class MenuItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<UserCubit, UserState>(
       builder: (context, state) {
-
         bool alreadyAdded = state.userdata.cart.contains(item.id);
 
         return Container(
-        // height: 160,
-        width: 120,
-        margin: EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: Colors.grey,
-          shape: BoxShape.rectangle,
-          borderRadius: BorderRadius.circular(14),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.only(top: 8.0),
-          child: Column(
-            children: [
-              CachedNetworkImage(
-                imageUrl: BASE_URL + item.image,
-                height: 80,
-                width: 80,
-              ),
-              Text(
-                item.name,
-                style: TextStyle(fontSize: 15),
-              ),
-              OutlinedButton(
-                onPressed: () {
-                  if (alreadyAdded) {
-                    //  remove
+          // height: 160,
+          width: 120,
+          margin: EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: Colors.grey,
+            shape: BoxShape.rectangle,
+            borderRadius: BorderRadius.circular(14),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.only(top: 8.0),
+            child: Column(
+              children: [
+                CachedNetworkImage(
+                  imageUrl: BASE_URL + item.image,
+                  height: 80,
+                  width: 80,
+                ),
+                Text(
+                  item.name,
+                  style: TextStyle(fontSize: 15),
+                ),
+                OutlinedButton(
+                  onPressed: () {
+                    if (alreadyAdded) {
+                      //  remove
                       BlocProvider.of<UserCubit>(context).removeToCart(item.id);
                     } else {
-                    //  add
-                    BlocProvider.of<UserCubit>(context).addToCart(item.id);
-
-                  }
-                },
-                child: Text(alreadyAdded ? "Remove - " : "Add +"),
-              ),
-              Text("₹${item.price.toString()}",
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18)),
-            ],
+                      //  add
+                      BlocProvider.of<UserCubit>(context).addToCart(item.id);
+                    }
+                  },
+                  child: Text(alreadyAdded ? "Remove - " : "Add +"),
+                ),
+                Text("₹${item.price.toString()}",
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18)),
+              ],
+            ),
           ),
-        ),
-      );
+        );
       },
     );
   }

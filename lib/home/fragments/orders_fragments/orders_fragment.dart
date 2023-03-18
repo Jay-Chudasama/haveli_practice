@@ -1,4 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:haveliapp/MyWidget/order_item.dart';
+import 'package:haveliapp/home/fragments/orders_fragments/orders_bloc.dart';
+import 'package:haveliapp/home/fragments/orders_fragments/orders_event.dart';
+import 'package:haveliapp/home/fragments/orders_fragments/orders_state.dart';
+import 'package:haveliapp/screens/OrderDetails/order_bloc.dart';
+
+import '../../../screens/OrderDetails/order_detils.dart';
 
 class OrderFragment extends StatelessWidget {
   const OrderFragment({Key? key}) : super(key: key);
@@ -6,93 +14,56 @@ class OrderFragment extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: const EdgeInsets.all(18.0),
-          child: Text(
-            "Order List",
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
-          ),
-        ),
-        Container(
-          margin: EdgeInsets.all(18),
-          padding: EdgeInsets.all(18),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            boxShadow: [
-              BoxShadow(color: Colors.black12, blurRadius: 14),
-            ],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Text(
-                    "2023",
-                    style: TextStyle(
-                        fontWeight: FontWeight.normal,
-                        fontSize: 20,
-                        color: Colors.grey),
-                  ),
-                  SizedBox(
-                    width: 50,
-                  ),
-                  Text(
-                    "Order :#",
-                    style: TextStyle(
-                        fontWeight: FontWeight.normal,
-                        fontSize: 20,
-                        color: Colors.grey),
-                  ),
-                  Text("3254",style: TextStyle(
-                      fontWeight: FontWeight.normal,
-                      fontSize: 20,
-                      color: Colors.black),),
-                ],
-              ),
-              SizedBox(height: 6,),
-
-              Row(
-                children: [
-                  Text(
-                    "23",
-                    style: TextStyle(
-                        fontWeight: FontWeight.normal,
-                        fontSize: 40,
-                        color: Colors.black),
-                  ),
-                  SizedBox(
-                    width: 52,
-                  ),
-                  Text(
-                    "Lunch",
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 24,
-                        color: Color.fromRGBO(146, 155, 67, 1)),
-                  ),
-                  Spacer(),
-                  Text(
-                    "OnHold",
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 24,
-                        color: Colors.red),
-                  ),
-                ],
-              ),
-              SizedBox(height: 6,),
-              Text(
-                "March",
-                style: TextStyle(
-                    fontWeight: FontWeight.normal,
-                    fontSize: 20,
-                    color: Colors.grey),
-              )
-            ],
-          ),
+        BlocConsumer<OrderBloc, OrderState>(
+          listener: (context, state) {
+            //todo
+          },
+          builder: (context, state) {
+            if (state is Init) {
+              BlocProvider.of<OrderBloc>(context).add(Order());
+            }
+            if (state is Loaded) {
+              return Expanded(
+                child: ListView.builder(
+                  itemBuilder: (context, index) {
+                    if (state is Loaded) {
+                      if (index == state.list.length) {
+                        if (state.nextUrl != null && !(state is LoadingMore)) {
+                          BlocProvider.of<OrderBloc>(context)
+                              .add(LoadMore(state.nextUrl!));
+                        }
+                        return Center(child: CircularProgressIndicator());
+                      }
+                    }
+                    return GestureDetector(
+                        onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => BlocProvider(
+                                  create: (context) => OrderDetailsBloc(),
+                                  child: OderDetails(state.list[index].id)),
+                            )),
+                        child: OrderList(state.list[index]));
+                  },
+                  itemCount: state is Loaded
+                      ? state.nextUrl != null
+                          ? state.list.length + 1
+                          : state.list.length
+                      : 0,
+                ),
+              );
+            }
+            if (state is Loading) {
+              CircularProgressIndicator();
+            }
+            if (state is Failed) {
+              return Center(
+                child: Text("Failed"),
+              );
+            }
+            return CircularProgressIndicator();
+          },
         )
       ],
     );

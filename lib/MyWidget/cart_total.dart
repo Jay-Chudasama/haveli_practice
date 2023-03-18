@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 
 class CartTotal extends StatelessWidget {
-  const CartTotal({Key? key}) : super(key: key);
+
+  int itemPrice,deliveryPrice;
+
+
+  CartTotal(this.itemPrice, this.deliveryPrice);
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +28,7 @@ class CartTotal extends StatelessWidget {
               ),
               Spacer(),
               Text(
-                "₹40",
+                "₹$itemPrice",
                 style: TextStyle(fontSize: 22),
               ),
             ],
@@ -40,7 +44,7 @@ class CartTotal extends StatelessWidget {
               ),
               Spacer(),
               Text(
-                "₹40",
+                "₹$deliveryPrice",
                 style: TextStyle(fontSize: 22),
               ),
             ],
@@ -56,7 +60,7 @@ class CartTotal extends StatelessWidget {
               ),
               Spacer(),
               Text(
-                "₹40",
+                "₹${itemPrice+deliveryPrice}",
                 style: TextStyle(fontSize: 22,fontWeight: FontWeight.bold),
               ),
             ],

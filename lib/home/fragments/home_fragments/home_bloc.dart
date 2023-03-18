@@ -1,10 +1,13 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:haveliapp/constant.dart';
 import 'package:haveliapp/home/fragments/home_fragments/home_event.dart';
 import 'package:haveliapp/home/fragments/home_fragments/home_repo.dart';
 import 'package:haveliapp/home/fragments/home_fragments/home_state.dart';
 import 'package:haveliapp/model/MenuModel.dart';
+import 'package:haveliapp/utils.dart';
 
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
   HomeRepo repo = HomeRepo();
@@ -13,16 +16,19 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<MenuLoad>((event, emit) async {
       emit(Loading());
       try {
-        var response = await repo.loadMenu();
+        var response = await repo.loadMenu(AREA);
         emit(Loaded(response.data['type'] == null
             ? null
             : MenuModel.fromJson(response.data)));
       } catch (value) {
+        print(value);
         DioError error = value as DioError;
         if (error.response != null) {
           if (error.response!.statusCode == 403 ||
               error.response!.statusCode == 401) {
             emit(Failed(UNAUTHENTICATED));
+          } else if (error.response!.data == "COMMING SOON...") {
+            emit(Failed(error.response!.data));
           } else {
             emit(Failed("Something went wrong!"));
           }
@@ -34,10 +40,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
           }
         }
       }
-    });
-
-    on<AddToCart>((event, emit) async {
-
     });
   }
 }

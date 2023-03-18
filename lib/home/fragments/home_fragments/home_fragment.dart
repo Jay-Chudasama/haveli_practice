@@ -1,6 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:haveliapp/MyWidget/menu_item.dart';
 import 'package:haveliapp/auth/auth_cubit.dart';
 import 'package:haveliapp/auth/auth_state.dart' as AuthState;
@@ -12,7 +14,7 @@ import 'package:haveliapp/utils.dart';
 import 'package:jiffy/jiffy.dart';
 
 class HomeFragment extends StatelessWidget {
-  const HomeFragment({Key? key}) : super(key: key);
+  Position? _currentPosition;
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +32,17 @@ class HomeFragment extends StatelessWidget {
       },
       builder: (context, state) {
         if (state is Init) {
-          BlocProvider.of<HomeBloc>(context).add(MenuLoad());
+          _getCurrentPosition(context).then((value) {
+            BlocProvider.of<HomeBloc>(context).add(MenuLoad());
+          }).catchError((value){
+            print(value);
+          });
+        }
+
+        if (state is Failed) {
+          return Center(
+            child: Text(state.messsage),
+          );
         }
 
         if (state is Loaded) {
@@ -49,7 +61,7 @@ class HomeFragment extends StatelessWidget {
                     children: [
                       Icon(Icons.location_on_outlined),
                       Text(
-                        "Naranpura, Ahmeda...",
+                        AREA,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           fontSize: 24,
@@ -152,5 +164,53 @@ class HomeFragment extends StatelessWidget {
         );
       },
     );
+  }
+
+  Future<bool> _handleLocationPermission(context) async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text(
+              'Location services are disabled. Please enable the services')));
+      return false;
+    }
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Location permissions are denied')));
+        return false;
+      }
+    }
+    if (permission == LocationPermission.deniedForever) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text(
+              'Location permissions are permanently denied, we cannot request permissions.')));
+      return false;
+    }
+    return true;
+  }
+
+  Future<void> _getCurrentPosition(context) async {
+    final hasPermission = await _handleLocationPermission(context);
+
+    if (!hasPermission) return;
+    _currentPosition = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+    await _getAddressFromLatLng(_currentPosition!);
+  }
+
+  Future<void> _getAddressFromLatLng(Position position) async {
+    List<Placemark> placemarks = await placemarkFromCoordinates(
+        _currentPosition!.latitude, _currentPosition!.longitude);
+
+    Placemark place = placemarks[0];
+    AREA = place.subLocality != null ? place.subLocality! : place.locality!;
+    print(place.locality);
+    print(place.subLocality);
   }
 }

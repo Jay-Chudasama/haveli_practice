@@ -1,13 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:haveliapp/constant.dart';
+import 'package:haveliapp/home/fragments/cart_fragments/cart_bloc.dart';
 import 'package:haveliapp/home/fragments/cart_fragments/cart_event.dart';
 import 'package:haveliapp/model/cart_model.dart';
 
-class CartItem extends StatelessWidget {
+import '../auth/user/user_cubit.dart';
+
+class CartItem extends StatefulWidget {
   CartModel model;
 
   CartItem(this.model);
 
+  @override
+  State<CartItem> createState() => _CartItemState();
+}
+
+class _CartItemState extends State<CartItem> {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -25,7 +34,7 @@ class CartItem extends StatelessWidget {
           ClipRRect(
             borderRadius: BorderRadius.circular(18),
             child: Image.network(
-              BASE_URL + model.image,
+              BASE_URL + widget.model.image,
               height: 100,
               width: 120,
               fit: BoxFit.cover,
@@ -39,14 +48,14 @@ class CartItem extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   Text(
-                    model.name,
+                    widget.model.name,
                     style: TextStyle(fontSize: 17),
                   ),
                   SizedBox(
                     height: 8,
                   ),
                   Text(
-                    model.price.toString(),
+                    widget.model.price.toString(),
                     style: TextStyle(fontSize: 17),
                   ),
                   SizedBox(
@@ -64,26 +73,46 @@ class CartItem extends StatelessWidget {
                             IconButton(
                               visualDensity: VisualDensity.compact,
                               onPressed: () {
-                                //todo
+                                setState(() {
+                                  widget.model.qty++;
+                                });
+                                BlocProvider.of<CartBloc>(context).add(
+                                    UpdateQty(
+                                        widget.model.id, widget.model.qty));
                               },
                               icon: Icon(Icons.add),
                             ),
-                            Text(model.qty.toString()),
+                            Text(widget.model.qty.toString()),
                             IconButton(
                               visualDensity: VisualDensity.compact,
-                              onPressed: () {
-                                //todo
-                              },
+                              onPressed: widget.model.qty == 1
+                                  ? null
+                                  : () {
+                                      setState(() {
+                                        widget.model.qty--;
+                                      });
+                                      BlocProvider.of<CartBloc>(context).add(
+                                          UpdateQty(widget.model.id,
+                                              widget.model.qty));
+                                    },
                               icon: Icon(Icons.remove),
                             )
                           ],
                         ),
                       ),
                       Spacer(),
-                      Icon(
-                        Icons.delete,
-                        size: 32,
-                        color: Colors.red,
+                      IconButton(
+                        onPressed: () {
+                          BlocProvider.of<UserCubit>(context)
+                              .removeToCart(widget.model.id);
+                          BlocProvider.of<CartBloc>(context)
+                              .add(Remove(widget.model));
+                        },
+                        icon: Icon(
+                          Icons.delete,
+                          size: 32,
+                          color: Colors.red,
+                        ),
                       )
                     ],
                   )

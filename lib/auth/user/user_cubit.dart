@@ -39,6 +39,11 @@ class UserCubit extends Cubit<UserState>{
   }
 
 
+  void emptyCart(){
+    state.userdata.cart.clear();
+    emit(UserState(state.userdata));
+
+  }
 
 
 

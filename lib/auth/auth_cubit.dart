@@ -10,6 +10,7 @@ class AuthCubit extends Cubit<AuthState> {
   AuthRepo repo = AuthRepo();
 
   Future<void> loaduserDetails() async {
+    emit(Authenticating());
     try {
       var response = await repo.userDetailsApi();
       emit(Authenticated(UserModel.fromJson(response.data)));
@@ -19,8 +20,8 @@ class AuthCubit extends Cubit<AuthState> {
       if (error.response != null) {
         if (error.response!.statusCode == 401 ||
             error.response!.statusCode == 403) {
-          emit(UnAuthenticated());
           deletToke();
+          emit(UnAuthenticated());
         } else {
           try {
             emit(Failed(error.response!.data));
@@ -36,5 +37,14 @@ class AuthCubit extends Cubit<AuthState> {
         }
       }
     }
+  }
+
+  Future<void> logout() async {
+    try {
+      var response = await repo.logout();
+    } catch (value) {
+      print(value);
+    }
+    emit(UnAuthenticated());
   }
 }
